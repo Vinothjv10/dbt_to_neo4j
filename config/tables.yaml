@@ -6,6 +6,7 @@ tables:
 - silver_layer.t1_ewbs_ewaybill_data_hubops
 - silver_layer.t1_prs_premise_master_hubops
 - silver_layer.t1_ss_address_details_hubops
+- silver_layer.t1_ss_shipment_dimentions_hubops_6M
 - silver_layer.t1_ss_shipment_operation_code_master
 - silver_layer.t1_st_shipment_tat_details_hubops
 - silver_layer.t2_hub_outscan_wise_awb_level_details

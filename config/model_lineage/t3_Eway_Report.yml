@@ -79,3 +79,5 @@ model:
     column_lineage:
     - column: current_location
       from_column: premise_name
+  - name: t1_prs_premise_master_hubops
+    schema: silver_layer

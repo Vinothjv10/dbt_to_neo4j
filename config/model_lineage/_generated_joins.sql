@@ -6,7 +6,7 @@
 -- ═══════════════════════════════════════════════
 -- Model: silver_layer.t3_Eway_Report
 -- File: models/HubOps_Dashboard/t3_Eway_Report.sql
--- Columns: 13 | Upstreams: 3
+-- Columns: 13 | Upstreams: 4
 -- ═══════════════════════════════════════════════
 
 SELECT
