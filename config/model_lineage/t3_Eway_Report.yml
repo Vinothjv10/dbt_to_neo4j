@@ -1,0 +1,81 @@
+model:
+  name: t3_Eway_Report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_Eway_Report.sql
+  columns:
+  - name: awb_number
+    expression: SELECT
+    description: AWB number (shipment identifier)
+  - name: Eway_bill_no
+    expression: Eway_bill_no
+    description: E-way bill number
+  - name: awb_Booking_date
+    expression: booking_date
+    description: Date when the AWB was booked
+  - name: Eway_bill_generated_date
+    expression: Eway_bill_generated_date
+    description: Date when the e-way bill was generated
+  - name: Eway_bill_expiry_date
+    expression: Eway_bill_expiry_date
+    description: Expiry date of the e-way bill
+  - name: booking_cp_id
+    expression: booking_cp_id
+    description: CP ID where the shipment was booked
+  - name: booking_cp_name
+    expression: booking_cp_name
+    description: CP name where the shipment was booked
+  - name: hub_id
+    expression: hub_id
+    description: Origin hub ID
+  - name: booking_hub_name
+    expression: booking_hub_name
+    description: Origin hub name
+  - name: zone
+    expression: zone
+    description: Zone of the origin hub
+  - name: current_location
+    expression: current_hub_name
+    description: Current hub name where shipment is located
+  - name: part_b_updated_time
+    expression: part_b_updated_time
+    description: Timestamp when e-way bill part B was last updated
+  - name: part_b_updated_hub
+    expression: part_b_updated_hub
+    description: Hub where e-way bill part B was last updated
+  upstreams:
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: awb_number
+      from_column: awb_number
+    - column: awb_Booking_date
+      from_column: booking_complete_time
+    - column: booking_cp_id
+      from_column: origin_cp_id
+    - column: booking_cp_name
+      from_column: origin_cp_name
+    - column: hub_id
+      from_column: origin_hub_id
+    - column: booking_hub_name
+      from_column: origin_hub_name
+    - column: zone
+      from_column: origin_zone
+  - name: t1_ewbs_ewaybill_data_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: Eway_bill_no
+      from_column: ewaybill_no
+    - column: Eway_bill_generated_date
+      from_column: eway_bill_crt_date
+    - column: Eway_bill_expiry_date
+      from_column: ewb_bill_exp_date
+    - column: part_b_updated_time
+      from_column: update_date
+    - column: part_b_updated_hub
+      from_column: ewb_opr_place
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: current_location
+      from_column: premise_name

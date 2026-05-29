@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "postgres-to-neo4j"
+version = "2.0.0"
+description = "Extract PostgreSQL table schemas & lineage and store in Neo4j"
+requires-python = ">=3.11"
+dependencies = [
+    "psycopg2-binary>=2.9",
+    "neo4j>=5.0",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pip",
+    "setuptools",
+]
+
+[project.scripts]
+postgres-to-neo4j = "postgres_to_neo4j.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["postgres_to_neo4j*"]

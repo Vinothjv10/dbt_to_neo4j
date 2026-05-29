@@ -1,0 +1,104 @@
+model:
+  name: t3_outscan_shipments
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_outscan_shipments.sql
+  columns:
+  - name: booking_complete_time
+    expression: "select\n\t  SD.booking_complete_time"
+    description: Timestamp when booking was completed
+    source_table: t2_master_hubops_bk
+    source_column: booking_complete_time
+  - name: operation_time
+    source_table: t2_master_hubops
+    source_column: operation_time
+    expression: SO.operation_time
+    description: Timestamp of the outscan operation
+  - name: awb_number
+    source_table: t2_master_hubops
+    source_column: awb_number
+    expression: SO.awb_number
+    description: AWB number (shipment identifier)
+  - name: origin_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: origin_hub_id
+    expression: SD.origin_hub_id
+    description: Origin hub ID
+  - name: origin_hub_name
+    source_table: t2_master_hubops_bk
+    source_column: origin_hub_name
+    expression: SD.origin_hub_name
+    description: Origin hub name
+  - name: current_hub_name
+    source_table: t2_master_hubops
+    source_column: premise_name
+    expression: SO.premise_name
+    description: Current hub name (where shipment is being scanned out from)
+  - name: destination_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: destination_hub_id
+    expression: SD.destination_hub_id
+    description: Destination hub ID
+  - name: destination_hub_name
+    source_table: t2_master_hubops_bk
+    source_column: destination_hub_name
+    expression: SD.destination_hub_name
+    description: Destination hub name
+  - name: doc_type
+    source_table: t2_master_hubops_bk
+    source_column: type
+    expression: SD.type
+    description: Document type
+  - name: mode
+    source_table: t2_master_hubops_bk
+    source_column: travel_by
+    expression: SD.travel_by
+    description: Mode of transportation
+  - name: booking_type
+    source_table: t2_master_hubops_bk
+    source_column: booking_type
+    expression: SD.booking_type
+    description: Type of booking
+  - name: service_type
+    source_table: t2_master_hubops_bk
+    source_column: service_type
+    expression: SD.service_type
+    description: Service type
+  - name: status
+    source_table: t2_master_hubops
+    source_column: status
+    expression: SO.status
+    description: Current shipment status
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: operation_time
+      from_column: operation_time
+    - column: awb_number
+      from_column: awb_number
+    - column: current_hub_name
+      from_column: premise_name
+    - column: status
+      from_column: status
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_complete_time
+      from_column: booking_complete_time
+    - column: origin_hub_id
+      from_column: origin_hub_id
+    - column: origin_hub_name
+      from_column: origin_hub_name
+    - column: destination_hub_id
+      from_column: destination_hub_id
+    - column: destination_hub_name
+      from_column: destination_hub_name
+    - column: doc_type
+      from_column: type
+    - column: mode
+      from_column: travel_by
+    - column: booking_type
+      from_column: booking_type
+    - column: service_type
+      from_column: service_type

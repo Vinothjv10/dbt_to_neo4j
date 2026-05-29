@@ -1,0 +1,88 @@
+model:
+  name: t3_shipments_inscan_vs_outscan_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_shipments_inscan_vs_outscan_report.sql
+  columns:
+  - name: date
+    expression: "SELECT\n    i.inscan_date"
+    description: Calendar date of the inscan operation, serving as the primary time dimension for daily operational efficiency
+      analysis at each hub.
+    source_table: t2_master_hubops
+    source_column: awb
+  - name: hub_id
+    source_table: t1_prs_premise_master_hubops
+    source_column: premise_id
+    expression: i.hub_id
+    description: Unique identifier of the hub where shipments were processed, serving as the primary dimension for hub-level
+      backlog detection.
+  - name: hub
+    source_table: t1_prs_premise_master_hubops
+    source_column: premise_name
+    expression: ppm.premise_name
+    description: Human-readable name of the hub for operational reporting, providing facility context in daily shift reviews.
+  - name: zone
+    expression: UPPER(ppm.zone)
+    description: Geographic zone of the processing hub, enabling regional aggregation for Pan India operational efficiency.
+    source_table: t1_prs_premise_master_hubops
+    source_column: zone
+  - name: state
+    expression: UPPER(ppm.state)
+    description: State location of the hub, used for state-level performance benchmarking across the network.
+    source_table: t1_prs_premise_master_hubops
+    source_column: state
+  - name: total_inscan_shipments
+    expression: COUNT(DISTINCT i.awb)
+    description: Count of distinct shipments physically received (inscanned) at the hub on the given date, representing total
+      inbound daily volume.
+    source_table: t2_master_hubops
+    source_column: awb
+  - name: total_inscan_shipments_weight
+    expression: SUM(sd.weight)
+    description: Sum of weights (kg) for all shipments received at the hub, used for volume-to-weight processing productivity
+      analysis.
+    source_table: t1_ss_shipment_dimentions_hubops_6M
+    source_column: weight
+  - name: total_outscan_shipments
+    expression: COUNT(CASE WHEN num_of_outscans != 0 THEN i.awb END)
+    description: Count of distinct shipments outscanned from the hub on or after the inscan date, representing daily outbound
+      throughput.
+    source_table: t2_master_hubops
+    source_column: awb
+  - name: total_outscan_shipments_weight
+    expression: SUM(CASE WHEN num_of_outscans != 0 THEN weight_of_outscans END)
+    description: Sum of weights for all outscanned shipments, tracking outbound weight flow and utilization.
+  - name: pending_shipments
+    expression: COUNT(CASE WHEN num_of_outscans = 0 THEN i.awb END)
+    description: Count of shipments that were inscanned but not yet outscanned, representing the processing backlog per hub
+      per day.
+    source_table: t2_master_hubops
+    source_column: awb
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: date
+      from_column: operation_time
+    - column: hub_id
+      from_column: premise_id
+    - column: total_inscan_shipments
+      from_column: awb_number
+    - column: total_outscan_shipments
+      from_column: awb_number
+    - column: pending_shipments
+      from_column: awb_number
+  - name: t1_ss_shipment_dimentions_hubops_6M
+    schema: silver_layer
+    column_lineage:
+    - column: total_inscan_shipments_weight
+      from_column: weight
+  - name: t1_prs_premise_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: hub
+      from_column: premise_name
+    - column: zone
+      from_column: zone
+    - column: state
+      from_column: state

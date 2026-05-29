@@ -1,0 +1,548 @@
+model:
+  name: t3_master_booking_hubops_delivery
+  schema: silver_layer
+  materialized: table
+  file_path: models/Control_Tower_Dashboard/t3_master_booking_hubops_delivery.sql
+  columns:
+  - name: select
+    expression: "select\n\t*"
+  - name: booking_month
+    data_type: null
+    description: The month in which the shipment was booked. Format is YYYYMM.
+    source: manifest_only
+  - name: booking_date
+    data_type: null
+    description: Date on which the shipment was booked.
+    source: manifest_only
+  - name: booking_date_time
+    data_type: null
+    description: Exact timestamp when the shipment was booked
+    source: manifest_only
+  - name: tracking_id
+    data_type: null
+    description: Unique shipment tracking number (AWB number)
+    source: manifest_only
+  - name: movement_type
+    data_type: null
+    description: Direction of shipment movement (FORWARD/REVERSE)
+    source: manifest_only
+  - name: status
+    data_type: null
+    description: Current status of the shipment as per the Innofulfill system (defaults to 'BOOKED' if no middle mile status)
+    source: manifest_only
+  - name: customer
+    data_type: null
+    description: Customer name - either client name (for ACCOUNT bookings) or sender name (for other service types)
+    source: manifest_only
+  - name: receiver_name
+    data_type: null
+    description: name of the receiver of the shipment
+    source: manifest_only
+  - name: document_type
+    data_type: null
+    description: Type of document being shipped (DOX/NON-DOX)
+    source: manifest_only
+  - name: service_type
+    data_type: null
+    description: Service level selected for delivery (STANDARD/FAST TRACK/VALUE PLUS/VAYUQUICK/VAYUQUICK PRO)
+    source: manifest_only
+  - name: booking_cp
+    data_type: null
+    description: The channel partner which booked the shipment
+    source: manifest_only
+  - name: origin_hub
+    data_type: null
+    description: Name of the hub where shipment originates
+    source: manifest_only
+  - name: current_location
+    data_type: null
+    description: Current location of the shipment as per the Innofulfill system (booking CP if not yet scanned)
+    source: manifest_only
+  - name: next_location
+    data_type: null
+    description: Next location of the shipment; when status is of OUTSCAN type as per the Innofulfill system
+    source: manifest_only
+  - name: destination_hub
+    data_type: null
+    description: Name of the destination hub
+    source: manifest_only
+  - name: latest_status_time
+    data_type: null
+    description: 'Timestamp of the most recent status update as per the Innofulfill system '
+    source: manifest_only
+  - name: origin_hub_inscan_at
+    data_type: null
+    description: 'Timestamp of the shipment''s last inscan at origin hub in the Innofulfill system; corresponds to status
+      ''INSCANNED''
+
+      '
+    source: manifest_only
+  - name: origin_hub_outscan_at
+    data_type: null
+    description: 'Timestamp of the shipments last outscan from origin hub as per the Innofulfill system; corresponds to statuses
+      (''HUB-OUTSCAN'', ''IN-BAG-OUTSCAN'', ''FORCE_HUB_OUTSCAN'')
+
+      '
+    source: manifest_only
+  - name: destination_hub_inscan_at
+    data_type: null
+    description: 'Timestamp of the shipment''s last inscan at destination hub as per the Innofulfill system; corresponds to
+      status ''HUB-IN-SCANNED''
+
+      '
+    source: manifest_only
+  - name: outscan_to_destination_cp_at
+    data_type: null
+    description: "Timestamp of the shipment's last outscan from the destination hub to to destination channel partner as per\
+      \ the Innofulfill system; corresponds to statuses 'OUT_SCAN_TO_CP', 'FORCE_OUTSCAN_TO_CP', 'IN_BAG_OUTSCAN_TO_CP\n \
+      \ \n"
+    source: manifest_only
+  - name: inscan_by_destination_cp_at
+    data_type: null
+    description: 'Timestamp of the shipment''s last inscan by destination channel partner as per the Innofulfill system; corresponds
+      to status ''INSCANNED_AT_CP''
+
+      '
+    source: manifest_only
+  - name: first_attempt_time
+    data_type: null
+    description: 'Timestamp of first delivery attempt as per the Innofulfill system '
+    source: manifest_only
+  - name: from_pincode
+    data_type: null
+    description: 'Pickup/sender pincode '
+    source: manifest_only
+  - name: from_city
+    data_type: null
+    description: Sender city name (based on pincode city state mapping in hubops)
+    source: manifest_only
+  - name: sender_state
+    data_type: null
+    description: Sender state name (based on pincode city state mapping in hubops)
+    source: manifest_only
+  - name: from_zone
+    data_type: null
+    description: Sender zone based on geographic region mapping
+    source: manifest_only
+  - name: to_pincode
+    data_type: null
+    description: Delivery/receiver pincode
+    source: manifest_only
+  - name: to_city
+    data_type: null
+    description: Receiver city name (based on pincode city state mapping in hubops)
+    source: manifest_only
+  - name: to_state
+    data_type: null
+    description: Receiver state name (based on pincode city state mapping in hubops)
+    source: manifest_only
+  - name: to_zone
+    data_type: null
+    description: Receiver zone based on geographic region mapping
+    source: manifest_only
+  - name: delivery_attempts
+    data_type: null
+    description: Number of delivery attempts made
+    source: manifest_only
+  - name: shipment_value
+    data_type: null
+    description: Declared value of the shipment in rupees
+    source: manifest_only
+  - name: booking_length
+    data_type: null
+    description: Length dimension of the shipment at booking
+    source: manifest_only
+  - name: booking_width
+    data_type: null
+    description: Width dimension of the shipment at booking
+    source: manifest_only
+  - name: booking_height
+    data_type: null
+    description: Height dimension of the shipment at booking
+    source: manifest_only
+  - name: weight_in_kg
+    data_type: null
+    description: Weight of the shipment in kilograms
+    source: manifest_only
+  - name: last_undelivered_reason
+    data_type: null
+    description: 'Reason for last failed delivery attempt as per the Innofulfill system '
+    source: manifest_only
+  - name: is_closed
+    data_type: null
+    description: 'Flag indicating if shipment is closed (YES/NO/STANDBY). YES - shipment is cancelled or a terminal status
+      (delivered/rto-delivered) is present NO - shipment is not cancelled or delivered; booking is present in system and shipment
+      is in-transit (any middle mile status after than MANIFESTED is there) STANDBY - otherwise
+
+      '
+    source: manifest_only
+  - name: Current Location (Sevasetu)
+    data_type: null
+    description: Current location of shipment as per Sevasetu system
+    source: manifest_only
+  - name: Current Status (Sevasetu)
+    data_type: null
+    description: Current status of shipment as per Sevasetu system
+    source: manifest_only
+  - name: Outscan to (Sevasetu)
+    data_type: null
+    description: Outscan destination as per Sevasetu system (in case status is OUTSCAN)
+    source: manifest_only
+  - name: Status Time (Sevasetu)
+    data_type: null
+    description: Status timestamp as per Sevasetu system
+    source: manifest_only
+  - name: remarks
+    data_type: null
+    description: Additional remarks or notes about the shipment
+    source: manifest_only
+  - name: last_drs_number
+    data_type: null
+    description: Last delivery run sheet number assigned
+    source: manifest_only
+  - name: last_drs_created_on
+    data_type: null
+    description: Date when last delivery run sheet was created
+    source: manifest_only
+  - name: last_terminal_status
+    data_type: null
+    description: 'Last terminal/final status of the shipment (DELIVERED / RTO DELIVERED) as per the Innofulfill system '
+    source: manifest_only
+  - name: last_terminal_status_time
+    data_type: null
+    description: Timestamp of the last terminal status as per the Innofulfill system
+    source: manifest_only
+  - name: last_terminal_status_date
+    data_type: null
+    description: Date of the last terminal status as per the Innofulfill system
+    source: manifest_only
+  - name: travel_type
+    data_type: null
+    description: Whether the shipment is travelling in surface mode or in air mode.
+    source: manifest_only
+  - name: is_booking_cancelled
+    data_type: null
+    description: Whether is shipment has been cancelled or not.
+    source: manifest_only
+  - name: last_undelivered_timestamp
+    data_type: null
+    description: Timestamp of the last undelivered status of the shipment
+    source: manifest_only
+  - name: origin_hub_id
+    data_type: null
+    description: ID of the origin hub in the HubOps system; foreign key to premise_id in prs_premise_master table in Hubops.
+    source: manifest_only
+  - name: destination_hub_id
+    data_type: null
+    description: ID of the destination hub in the HubOps system; foreign key to premise_id in prs_premise_master table in
+      Hubops.
+    source: manifest_only
+  - name: is_terminal
+    data_type: null
+    description: Is there a terminal status against this shipment. Terminal statuses include 'DELIVERED', 'RTO DELIVERED',
+      '3PL ITEM DELIVERY'
+    source: manifest_only
+  - name: current_hub_id
+    data_type: null
+    description: ID of the current location of the shipment
+    source: manifest_only
+  - name: Last DRS (Sevasetu)
+    data_type: null
+    description: Last DRS number displayed in the Sevasetu system
+    source: manifest_only
+  - name: Last DRS Created On (Sevasetu)
+    data_type: null
+    description: Timestamp of creation of the last DRS of this shipment
+    source: manifest_only
+  - name: Last Terminal Status (Sevasetu)
+    data_type: null
+    description: Last terminal status of this shipment as per the Sevasetu system
+    source: manifest_only
+  - name: Last Terminal Status Time (Sevasetu)
+    data_type: null
+    description: Timestamp of the last terminal status of this shipment as per the Sevasetu system
+    source: manifest_only
+  - name: latest_middle_mile_location
+    data_type: null
+    description: '[DEPRECATED] the name of the hub/cp of the last middle mile status'
+    source: manifest_only
+  - name: latest_middle_mile_status
+    data_type: null
+    description: '[DEPRECATED] the last middle mile status'
+    source: manifest_only
+  - name: latest_status_date
+    data_type: null
+    description: '[IN-DEVELOPMENT] the date of the last status'
+    source: manifest_only
+  - name: trip_id
+    data_type: null
+    description: '[IN-DEVELOPMENT] the ID of the last trip'
+    source: manifest_only
+  - name: stop_id
+    data_type: null
+    description: '[IN-DEVELOPMENT] the ID of the last stop'
+    source: manifest_only
+  - name: trip_departed_at
+    data_type: null
+    description: '[IN-DEVELOPMENT] the timestamp of departure of the vehicle from the trip''s origin hub'
+    source: manifest_only
+  - name: trip_arrived_at
+    data_type: null
+    description: '[IN-DEVELOPMENT] the timestamp of arrival of the vehicle at the trip''s destination hub'
+    source: manifest_only
+  - name: vehicle_num
+    data_type: null
+    description: '[IN-DEVELOPMENT] the vehicle number of the vehicle executing the last trip'
+    source: manifest_only
+  - name: trip_start_hub
+    data_type: null
+    description: '[IN-DEVELOPMENT] the name of the origin hub of the last trip'
+    source: manifest_only
+  - name: trip_start_hub_id
+    data_type: null
+    description: '[IN-DEVELOPMENT] the ID of the origin hub of the last trip'
+    source: manifest_only
+  - name: trip_end_hub
+    data_type: null
+    description: '[IN-DEVELOPMENT] the name of the destination hub of the last trip'
+    source: manifest_only
+  - name: trip_end_hub_id
+    data_type: null
+    description: '[IN-DEVELOPMENT] the ID of the destination hub of the last trip'
+    source: manifest_only
+  - name: is_middle_mile_start
+    data_type: null
+    description: 0/1 flag indicating if the shipment has any middle mile status
+    source: manifest_only
+  - name: is_last_mile_start
+    data_type: null
+    description: 0/1 flag indicating if the shipment has any last mile status
+    source: manifest_only
+  - name: anomaly_booked_after_first_scan
+    data_type: null
+    description: Boolean flag indicating if the shipment has been booked after the first inscan at the origin hub
+    source: manifest_only
+  - name: anomaly_no_middle_mile_but_shipment_in_last_mile
+    data_type: null
+    description: Boolean flag indicating if the shipment doesn't have any middle mile status but has a last mile status
+    source: manifest_only
+  - name: anomaly_location_blank
+    data_type: null
+    description: Boolean flag indicating if origin/destination pincode/city/state is missing
+    source: manifest_only
+  - name: anomaly_origin_hub_missing
+    data_type: null
+    description: Boolean flag indicating if the origin hub value of this shipment is missing
+    source: manifest_only
+  - name: anomaly_destination_hub_missing
+    data_type: null
+    description: Boolean flag indicating if the destination hub value of this shipment is missing
+    source: manifest_only
+  - name: anomaly_current_location_missing
+    data_type: null
+    description: Boolean flag indicating if the current location value of this shipment is missing
+    source: manifest_only
+  - name: is_anomaly
+    data_type: null
+    description: Boolean flag indicating if the shipment has any anomaly
+    source: manifest_only
+  - name: is_backfilled
+    data_type: null
+    description: YES/NO flag indicating whether certain columns values in the row were backfilled
+    source: manifest_only
+  upstreams:
+  - name: t3_master_booking_hubops_delivery_pre_clean
+    schema: silver_layer
+    column_lineage:
+    - column: Current Location (Sevasetu)
+      from_column: Current Location (Sevasetu)
+    - column: Current Status (Sevasetu)
+      from_column: Current Status (Sevasetu)
+    - column: Last DRS (Sevasetu)
+      from_column: Last DRS (Sevasetu)
+    - column: Last DRS Created On (Sevasetu)
+      from_column: Last DRS Created On (Sevasetu)
+    - column: Last Terminal Status (Sevasetu)
+      from_column: Last Terminal Status (Sevasetu)
+    - column: Last Terminal Status Time (Sevasetu)
+      from_column: Last Terminal Status Time (Sevasetu)
+    - column: Outscan to (Sevasetu)
+      from_column: Outscan to (Sevasetu)
+    - column: Status Time (Sevasetu)
+      from_column: Status Time (Sevasetu)
+    - column: anomaly_booked_after_first_scan
+      from_column: anomaly_booked_after_first_scan
+    - column: anomaly_current_location_missing
+      from_column: anomaly_current_location_missing
+    - column: anomaly_delivered_but_ofd_time_missing_in_dispatch
+      from_column: anomaly_delivered_but_ofd_time_missing_in_dispatch
+    - column: anomaly_delivered_but_ofd_time_missing_in_hubops
+      from_column: anomaly_delivered_but_ofd_time_missing_in_hubops
+    - column: anomaly_destination_hub_missing
+      from_column: anomaly_destination_hub_missing
+    - column: anomaly_location_blank
+      from_column: anomaly_location_blank
+    - column: anomaly_no_middle_mile_but_shipment_in_last_mile
+      from_column: anomaly_no_middle_mile_but_shipment_in_last_mile
+    - column: anomaly_origin_hub_missing
+      from_column: anomaly_origin_hub_missing
+    - column: booking_cp
+      from_column: booking_cp
+    - column: booking_date
+      from_column: booking_date
+    - column: booking_date_time
+      from_column: booking_date_time
+    - column: booking_height
+      from_column: booking_height
+    - column: booking_length
+      from_column: booking_length
+    - column: booking_month
+      from_column: booking_month
+    - column: booking_type
+      from_column: booking_type
+    - column: booking_width
+      from_column: booking_width
+    - column: client
+      from_column: client
+    - column: current_hub_id
+      from_column: current_hub_id
+    - column: customer
+      from_column: customer
+    - column: dag_type
+      from_column: dag_type
+    - column: delivery_attempts
+      from_column: delivery_attempts
+    - column: destination_hub
+      from_column: destination_hub
+    - column: destination_hub_id
+      from_column: destination_hub_id
+    - column: destination_hub_inscan_at
+      from_column: destination_hub_inscan_at
+    - column: document_type
+      from_column: document_type
+    - column: first_delivered_new_drs_number
+      from_column: first_delivered_new_drs_number
+    - column: first_delivered_time
+      from_column: first_delivered_time
+    - column: first_ofd_attempt_new_drs_number
+      from_column: first_ofd_attempt_new_drs_number
+    - column: first_ofd_attempt_time
+      from_column: first_ofd_attempt_time
+    - column: first_terminal_status
+      from_column: first_terminal_status
+    - column: first_terminal_status_time
+      from_column: first_terminal_status_time
+    - column: from_city
+      from_column: from_city
+    - column: from_pincode
+      from_column: from_pincode
+    - column: from_zone
+      from_column: from_zone
+    - column: inscan_by_destination_cp_at
+      from_column: inscan_by_destination_cp_at
+    - column: is_booking_cancelled
+      from_column: is_booking_cancelled
+    - column: is_closed
+      from_column: is_closed
+    - column: is_dp_client
+      from_column: is_dp_client
+    - column: is_last_mile_start
+      from_column: is_last_mile_start
+    - column: is_middle_mile_start
+      from_column: is_middle_mile_start
+    - column: is_terminal
+      from_column: is_terminal
+    - column: last_drs_created_on
+      from_column: last_drs_created_on
+    - column: last_drs_number
+      from_column: last_drs_number
+    - column: last_terminal_status
+      from_column: last_terminal_status
+    - column: last_terminal_status_date
+      from_column: last_terminal_status_date
+    - column: last_terminal_status_time
+      from_column: last_terminal_status_time
+    - column: last_undelivered_reason
+      from_column: last_undelivered_reason
+    - column: last_undelivered_timestamp
+      from_column: last_undelivered_timestamp
+    - column: latest_middle_mile_location
+      from_column: latest_middle_mile_location
+    - column: latest_middle_mile_status
+      from_column: latest_middle_mile_status
+    - column: latest_status_date
+      from_column: latest_status_date
+    - column: latest_status_time
+      from_column: latest_status_time
+    - column: movement_type
+      from_column: movement_type
+    - column: next_location
+      from_column: next_location
+    - column: origin_hub
+      from_column: origin_hub
+    - column: origin_hub_id
+      from_column: origin_hub_id
+    - column: origin_hub_inscan_at
+      from_column: origin_hub_inscan_at
+    - column: origin_hub_outscan_at
+      from_column: origin_hub_outscan_at
+    - column: outscan_to_destination_cp_at
+      from_column: outscan_to_destination_cp_at
+    - column: receiver_name
+      from_column: receiver_name
+    - column: remarks
+      from_column: remarks
+    - column: sender_state
+      from_column: sender_state
+    - column: service_type
+      from_column: service_type
+    - column: shipment_value
+      from_column: shipment_value
+    - column: status
+      from_column: status
+    - column: stop_id
+      from_column: stop_id
+    - column: tat_in_hrs
+      from_column: tat_in_hrs
+    - column: to_city
+      from_column: to_city
+    - column: to_pincode
+      from_column: to_pincode
+    - column: to_state
+      from_column: to_state
+    - column: to_zone
+      from_column: to_zone
+    - column: tracking_id
+      from_column: tracking_id
+    - column: travel_type
+      from_column: travel_type
+    - column: trip_arrived_at
+      from_column: trip_arrived_at
+    - column: trip_departed_at
+      from_column: trip_departed_at
+    - column: trip_end_hub
+      from_column: trip_end_hub
+    - column: trip_end_hub_id
+      from_column: trip_end_hub_id
+    - column: trip_id
+      from_column: trip_id
+    - column: trip_start_hub
+      from_column: trip_start_hub
+    - column: trip_start_hub_id
+      from_column: trip_start_hub_id
+    - column: vehicle_num
+      from_column: vehicle_num
+    - column: weight_in_kg
+      from_column: weight_in_kg
+  - name: t3_shipment_current_location
+    schema: silver_layer
+    column_lineage:
+    - column: current_location
+      from_column: premise_name
+  - name: t1_st_shipment_tat_details_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: planned_edd
+      from_column: planned_edd
+    - column: revised_edd
+      from_column: revised_edd

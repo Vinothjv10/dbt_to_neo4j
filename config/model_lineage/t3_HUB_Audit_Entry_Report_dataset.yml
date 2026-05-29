@@ -1,0 +1,189 @@
+model:
+  name: t3_HUB_Audit_Entry_Report_dataset
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_HUB_Audit_Entry_Report_dataset.sql
+  columns:
+  - name: document_no
+    expression: "SELECT\n\tA.awb_no"
+    description: AWB number (document identifier)
+  - name: booking_date
+    source_table: t2_master_hubops_bk
+    source_column: booking_date
+    expression: D.booking_date
+    description: Date when the shipment was booked
+  - name: from_center
+    source_table: t2_master_hubops_bk
+    source_column: from_center
+    expression: D.from_center
+    description: Origin center name
+  - name: to_center
+    source_table: t2_master_hubops_bk
+    source_column: to_center
+    expression: D.to_center
+    description: Destination center name
+  - name: document_type
+    source_table: t2_master_hubops_bk
+    source_column: document_type
+    expression: D.document_type
+    description: Type of document
+  - name: service_type
+    source_table: t2_master_hubops_bk
+    source_column: service_type
+    expression: D.service_type
+    description: Service type
+  - name: travel_by
+    source_table: t2_master_hubops_bk
+    source_column: travel_by
+    expression: D.travel_by
+    description: Mode of transportation
+  - name: charges
+    source_table: t2_master_hubops_bk
+    source_column: charges
+    expression: D.charges
+    description: Total charges
+  - name: invoice_no
+    expression: ''''''
+    description: Invoice number
+  - name: sender
+    source_table: t2_master_hubops_bk
+    source_column: sender_name
+    expression: D.sender_name
+    description: Sender name
+  - name: receiver
+    source_table: t2_master_hubops_bk
+    source_column: receiver_name
+    expression: D.receiver_name
+    description: Receiver name
+  - name: booking_weight
+    source_table: t1_aus_audit_event_hubops
+    source_column: booked_weight
+    expression: A.booked_weight
+    description: Weight as recorded during booking
+  - name: audited_weight
+    source_table: t1_aus_audit_event_hubops
+    source_column: audited_weight
+    expression: A.audited_weight
+    description: Weight as recorded during audit
+  - name: weight_difference
+    source_table: t1_aus_audit_event_hubops
+    source_column: weight_difference
+    expression: A.weight_difference
+    description: Absolute difference between booking and audited weight
+  - name: weight_difference_percentage
+    source_table: t1_aus_audit_event_hubops
+    source_column: weight_difference_percentage
+    expression: A.weight_difference_percentage
+    description: Percentage difference between booking and audited weight
+  - name: volumetric_booked_weight
+    source_table: t1_aus_audit_event_hubops
+    source_column: volumetric_booked_weight
+    expression: A.volumetric_booked_weight
+    description: Volumetric weight as booked
+  - name: volumetric_audited_weight
+    source_table: t1_aus_audit_event_hubops
+    source_column: volumetric_audited_weight
+    expression: A.volumetric_audited_weight
+    description: Volumetric weight as audited
+  - name: audited_hub_id
+    source_table: t1_aus_audit_event_hubops
+    source_column: audited_hub_id
+    expression: A.audited_hub_id
+    description: Hub ID where audit was performed
+  - name: audited_hub
+    source_table: t1_aus_audit_event_hubops
+    source_column: audited_hub
+    expression: A.audited_hub
+    description: Hub name where audit was performed
+  - name: length
+    source_table: t1_aus_audit_event_hubops
+    source_column: length
+    expression: A.length
+    description: Audited length measurement
+  - name: width
+    source_table: t1_aus_audit_event_hubops
+    source_column: width
+    expression: A.width
+    description: Audited width measurement
+  - name: height
+    source_table: t1_aus_audit_event_hubops
+    source_column: height
+    expression: A.height
+    description: Audited height measurement
+  - name: booking_type
+    source_table: t2_master_hubops_bk
+    source_column: cash_account
+    expression: D.cash_account
+    description: Type of booking
+  - name: manual_auto
+    source_table: t1_aus_audit_event_hubops
+    source_column: manual_auto
+    expression: A.manual_auto
+    description: Audit method (Auto or Manual)
+  - name: status
+    source_table: t1_aus_audit_event_hubops
+    source_column: status
+    expression: A.status
+    description: Audit status
+  - name: audit_date
+    source_table: t1_aus_audit_event_hubops
+    source_column: create_ts
+    expression: A.create_ts
+    description: Date and time of audit
+  upstreams:
+  - name: t1_prs_premise_master_hubops
+    schema: silver_layer
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_date
+      from_column: booking_date
+    - column: from_center
+      from_column: from_center
+    - column: to_center
+      from_column: to_center
+    - column: document_type
+      from_column: document_type
+    - column: service_type
+      from_column: service_type
+    - column: travel_by
+      from_column: travel_by
+    - column: charges
+      from_column: charges
+    - column: sender
+      from_column: sender_name
+    - column: receiver
+      from_column: receiver_name
+    - column: booking_type
+      from_column: cash_account
+  - name: t1_aus_audit_event_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: booking_weight
+      from_column: booked_weight
+    - column: audited_weight
+      from_column: audited_weight
+    - column: weight_difference
+      from_column: weight_difference
+    - column: weight_difference_percentage
+      from_column: weight_difference_percentage
+    - column: volumetric_booked_weight
+      from_column: volumetric_booked_weight
+    - column: volumetric_audited_weight
+      from_column: volumetric_audited_weight
+    - column: audited_hub_id
+      from_column: audited_hub_id
+    - column: audited_hub
+      from_column: audited_hub
+    - column: length
+      from_column: length
+    - column: width
+      from_column: width
+    - column: height
+      from_column: height
+    - column: manual_auto
+      from_column: manual_auto
+    - column: status
+      from_column: status
+    - column: audit_date
+      from_column: create_ts

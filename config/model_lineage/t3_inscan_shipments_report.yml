@@ -1,0 +1,89 @@
+model:
+  name: t3_inscan_shipments_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_inscan_shipments_report.sql
+  columns:
+  - name: operation_time
+    expression: "SELECT\n\t\ts2.operation_time"
+    source_table: t2_master_hubops
+    source_column: operation_time
+  - name: premise_id
+    source_table: t2_master_hubops
+    source_column: premise_id
+    expression: s2.premise_id
+    description: Unique identifier of the hub where the shipment was physically received,
+      used to identify the receiving facility for this inbound event.
+  - name: premise_name
+    source_table: t2_master_hubops
+    source_column: premise_name
+    expression: s2.premise_name
+    description: Human-readable name of the hub where the shipment was received, providing
+      facility context for network-wide inbound flow tracking.
+  - name: awb_number
+    data_type: null
+    description: Unique Air Waybill (AWB) number identifying each shipment, serving
+      as the primary key to track physical receipt and subsequent outscan events.
+    source: manifest_only
+  - name: inscan_time
+    data_type: null
+    description: Timestamp when the shipment was physically received and inscanned
+      at the hub, marking the start of inbound processing and initiating the SLA timer.
+    source: manifest_only
+  - name: booking_cp_id
+    data_type: null
+    description: Channel Partner identifier from the original booking, linking the
+      shipment to its booking origin for CP attribution.
+    source: manifest_only
+  - name: booking_cp
+    data_type: null
+    description: Name of the Channel Partner who originally booked this shipment,
+      used for first-mile CP performance analysis.
+    source: manifest_only
+  - name: booking_type
+    data_type: null
+    description: Classification of the booking (e.g., Prepaid, COD, Reverse Pickup),
+      used to segment inbound shipments by service type for processing analysis.
+    source: manifest_only
+  - name: service_type
+    data_type: null
+    description: Service level of the shipment (Express, Standard, etc.), used to
+      track service-tier-specific processing times.
+    source: manifest_only
+  - name: travel_by
+    data_type: null
+    description: Transport mode (Air/Surface) assigned at booking, used for mode-specific
+      SLA analysis and processing efficiency tracking.
+    source: manifest_only
+  - name: doc_type
+    data_type: null
+    description: Document type classification (DOX/NON-DOX) from booking, used to
+      segment shipments for regulatory handling.
+    source: manifest_only
+  - name: user_email_id
+    data_type: null
+    description: Email ID of the hub operator who performed the inscan, enabling user-level
+      audit trail.
+    source: manifest_only
+  - name: outscan_time
+    data_type: null
+    description: Timestamp when the shipment was first outscanned from the receiving
+      hub, used to calculate time-to-outscan and SLA compliance.
+    source: manifest_only
+  - name: outscan_hub
+    data_type: null
+    description: Name of the hub where the shipment was first outscanned, identifying
+      the dispatching hub for outbound flow tracking.
+    source: manifest_only
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: operation_time
+      from_column: operation_time
+    - column: premise_id
+      from_column: premise_id
+    - column: premise_name
+      from_column: premise_name
+  - name: t2_master_hubops_bk
+    schema: silver_layer

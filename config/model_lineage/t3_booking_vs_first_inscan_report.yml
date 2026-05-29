@@ -1,0 +1,83 @@
+model:
+  name: t3_booking_vs_first_inscan_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_booking_vs_first_inscan_report.sql
+  columns:
+  - name: date
+    expression: SELECT
+    description: Booking date
+  - name: awb_number
+    expression: awb_number
+    description: AWB number (shipment identifier)
+  - name: audit
+    expression: audit
+    description: Audit event type (Inscan)
+  - name: service_type
+    expression: service_type
+    description: Service type of the shipment
+  - name: travel_by
+    expression: travel_by
+    description: Mode of travel
+  - name: type
+    expression: type
+    description: Document type
+  - name: booking_cp_id
+    expression: booking_cp_id
+    description: Booking CP ID
+  - name: booking_cp
+    expression: booking_cp
+    description: Booking CP name
+  - name: to_hub_id
+    expression: to_hub_id
+    description: 'Origin hub ID where the shipments was first inscanned '
+  - name: to_hub
+    expression: to_hub
+    description: Origin hub name where the shipments was first inscanned
+  - name: parent_hub_id
+    expression: parent_hub_id
+  - name: parent_hub_name
+    expression: parent_hub_name
+  - name: zone
+    expression: zone
+    description: Hub zone
+  - name: booking_cp_pincode
+    source_table: t2_master_hubops_bk
+    source_column: booking_cp_pincode
+    expression: ad.booking_cp_pincode
+    description: Pickup pincode location of the shipment
+  - name: to_hub_pincode
+    source_table: t2_master_hubops_bk
+    source_column: to_hub_pincode
+    expression: ad.to_hub_pincode
+    description: Destination pincode location of the shipment
+  - name: distance_in_km
+    source_table: t3_pincode_distance_matrix
+    source_column: distance_in_km
+    expression: pdm.distance_in_km
+    description: Distance in kilometers from booking CP to inscan hub
+  - name: distance_bucket
+    expression: "CASE \n\t\tWHEN pdm.distance_in_km IS NULL THEN ''\n\t\tWHEN pdm.distance_in_km\
+      \ <= 10 THEN ''\n\t\tWHEN pdm.distance_in_km <= 20 "
+    description: Distance bucket category for distance segmentation
+    source_table: t3_pincode_distance_matrix
+    source_column: distance_in_km
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+  - name: t1_prs_premise_master_hubops
+    schema: silver_layer
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_cp_pincode
+      from_column: booking_cp_pincode
+    - column: to_hub_pincode
+      from_column: to_hub_pincode
+  - name: t3_pincode_distance_matrix
+    schema: silver_layer
+    column_lineage:
+    - column: distance_in_km
+      from_column: distance_in_km
+    - column: distance_bucket
+      from_column: distance_in_km

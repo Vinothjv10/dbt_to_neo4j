@@ -1,0 +1,135 @@
+model:
+  name: t3_booking_data_vs_status_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_booking_data_vs_status_report.sql
+  columns:
+  - name: shipment_no
+    expression: "SELECT\n    D.awb_number"
+    description: AWB number (shipment identifier)
+  - name: booking_datetime
+    source_table: t2_master_hubops_bk
+    source_column: booking_datetime
+    expression: D.booking_datetime
+    description: datetime when the shipment was booked
+  - name: from_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: src_hub_id
+    expression: D.src_hub_id
+    description: Origin hub ID of the shipment
+  - name: from_hub
+    source_table: t2_master_hubops_bk
+    source_column: src_hub_name
+    expression: D.src_hub_name
+    description: Origin hub name of the shipment
+  - name: from_cp_id
+    source_table: t2_master_hubops_bk
+    source_column: src_cp_id
+    expression: D.src_cp_id
+    description: Origin CP ID of the shipment
+  - name: from_cp
+    source_table: t2_master_hubops_bk
+    source_column: src_cp_name
+    expression: D.src_cp_name
+    description: Origin CP name of the shipment
+  - name: from_pincode
+    source_table: t2_master_hubops_bk
+    source_column: pickup_pincode
+    expression: D.pickup_pincode
+    description: Pickup location pincode of the shipment
+  - name: audited_weight
+    source_table: t1_aus_audit_event_hubops
+    source_column: audited_weight
+    expression: A.audited_weight
+    description: Weight as recorded during audit
+  - name: product_type
+    source_table: t2_master_hubops_bk
+    source_column: product_type
+    expression: D.product_type
+    description: Type of product
+  - name: booking_type
+    source_table: t2_master_hubops_bk
+    source_column: booking_type
+    expression: D.booking_type
+    description: Type of booking
+  - name: transport_mode
+    source_table: t2_master_hubops_bk
+    source_column: transport_mode
+    expression: D.transport_mode
+    description: Mode of transportation
+  - name: to_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: destination_hub_id
+    expression: D.destination_hub_id
+    description: Destination hub ID of the shipment
+  - name: to_hub_name
+    source_table: t2_master_hubops_bk
+    source_column: destination_hub_name
+    expression: D.destination_hub_name
+    description: Destination hub name of the shipment
+  - name: to_cp_name
+    source_table: t2_master_hubops_bk
+    source_column: destination_cp_name
+    expression: D.destination_cp_name
+    description: Destination CP name of the shipment
+  - name: to_pincode
+    source_table: t2_master_hubops_bk
+    source_column: destination_pincode
+    expression: D.destination_pincode
+    description: Delivery location pincode of the shipment
+  - name: status
+    expression: "CASE \n        WHEN A.audit_method = '' THEN ''\n        WHEN A.audit_method\
+      \ = '' THEN ''\n        ELSE ''\n    END"
+    description: Audit status (Auto_Audited, Manual_Audited, or N/A)
+  - name: current_premise_name
+    source_table: t2_master_hubops
+    source_column: current_premise_name
+    expression: S.current_premise_name
+    description: Current location premise name of the shipment
+  - name: current_status
+    source_table: t2_master_hubops
+    source_column: current_status
+    expression: S.current_status
+    description: Current shipment status
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: current_premise_name
+      from_column: current_premise_name
+    - column: current_status
+      from_column: current_status
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_datetime
+      from_column: booking_datetime
+    - column: from_hub_id
+      from_column: src_hub_id
+    - column: from_hub
+      from_column: src_hub_name
+    - column: from_cp_id
+      from_column: src_cp_id
+    - column: from_cp
+      from_column: src_cp_name
+    - column: from_pincode
+      from_column: pickup_pincode
+    - column: product_type
+      from_column: product_type
+    - column: booking_type
+      from_column: booking_type
+    - column: transport_mode
+      from_column: transport_mode
+    - column: to_hub_id
+      from_column: destination_hub_id
+    - column: to_hub_name
+      from_column: destination_hub_name
+    - column: to_cp_name
+      from_column: destination_cp_name
+    - column: to_pincode
+      from_column: destination_pincode
+  - name: t1_aus_audit_event_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: audited_weight
+      from_column: audited_weight

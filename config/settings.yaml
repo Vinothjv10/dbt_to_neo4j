@@ -1,0 +1,19 @@
+# ── Pipeline settings ─────────────────────────────────────────────────
+
+neo4j:
+  # Delete all existing nodes before writing
+  clear_before_write: true
+  # Number of records per transaction (reserved for future batching)
+  batch_size: 100
+
+extraction:
+  # Extract foreign-key relationships (table-level + column-level)
+  include_foreign_keys: true
+  # Extract view / materialized-view dependencies
+  include_view_deps: true
+  # Extract column-level lineage (FK_REFERENCE edges)
+  include_column_lineage: true
+
+logging:
+  # Show every Cypher query in the console
+  verbose: false

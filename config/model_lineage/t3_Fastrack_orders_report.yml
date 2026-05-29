@@ -1,0 +1,140 @@
+model:
+  name: t3_Fastrack_orders_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_Fastrack_orders_report.sql
+  columns:
+  - name: documentno
+    expression: documentno
+    description: AWB number (document identifier)
+  - name: booking_date
+    expression: booking_complete_time
+    description: Date when the shipment was booked
+  - name: booking_cp_id
+    source_table: t2_master_hubops_bk
+    source_column: origin_cp_id
+    expression: B.origin_cp_id
+    description: CP ID where shipment was booked
+  - name: booking_cp
+    source_table: t2_master_hubops_bk
+    source_column: origin_cp_name
+    expression: B.origin_cp_name
+    description: CP name where shipment was booked
+  - name: parent_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: origin_hub_id
+    expression: B.origin_hub_id
+    description: Parent hub ID
+  - name: parent_hub_name
+    source_table: t2_master_hubops_bk
+    source_column: origin_hub_name
+    expression: B.origin_hub_name
+    description: Parent hub name
+  - name: from_state
+    source_table: t2_master_hubops_bk
+    source_column: origin_state
+    expression: B.origin_state
+    description: Origin state
+  - name: to_pincode
+    expression: to_pincode
+    description: Destination pincode
+  - name: to_city
+    source_table: t2_master_hubops_bk
+    source_column: destination_city
+    expression: B.destination_city
+    description: Destination city
+  - name: to_state
+    source_table: t2_master_hubops_bk
+    source_column: destination_state
+    expression: B.destination_state
+    description: Destination state
+  - name: destination_hub_name
+    source_table: t2_master_hubops_bk
+    source_column: destination_hub_name
+    expression: B.destination_hub_name
+    description: Destination hub name
+  - name: to_center_name
+    source_table: t2_master_hubops_bk
+    source_column: to_center_name
+    expression: B.to_center_name
+    description: Destination center/CP name
+  - name: receiver_name
+    source_table: t2_master_hubops_bk
+    source_column: receiver_name
+    expression: B.receiver_name
+    description: Receiver name
+  - name: booking_type
+    expression: booking_type
+    description: Type of booking
+  - name: service_type
+    expression: service_type
+    description: Service type (FAST TRACK or VALUE PLUS)
+  - name: document_type
+    expression: document_type
+    description: Type of document
+  - name: travel_by
+    expression: travel_by
+    description: Mode of transportation
+  - name: booking_weight
+    expression: B.booking_weight || ''
+    description: Weight of the shipment in Kgs
+  - name: charges
+    expression: ''''' || total_charges'
+    description: Total charges in INR
+  - name: Zone
+    source_table: t2_master_hubops_bk
+    source_column: origin_zone
+    expression: B.origin_zone
+    description: Zone of origin
+  - name: status
+    source_table: t2_master_hubops_bk
+    source_column: status
+    expression: B.status
+    description: Current shipment status
+  - name: deliverydate
+    source_table: t2_master_hubops_bk
+    source_column: operation_time
+    expression: B.operation_time
+    description: Delivery/last operation date
+  - name: current_premise_name
+    source_table: t2_master_hubops_bk
+    source_column: current_premise_name
+    expression: B.current_premise_name
+    description: Current location premise name
+  - name: POD
+    expression: ''''''
+    description: Proof of delivery
+  upstreams:
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_cp_id
+      from_column: origin_cp_id
+    - column: booking_cp
+      from_column: origin_cp_name
+    - column: parent_hub_id
+      from_column: origin_hub_id
+    - column: parent_hub_name
+      from_column: origin_hub_name
+    - column: from_state
+      from_column: origin_state
+    - column: to_city
+      from_column: destination_city
+    - column: to_state
+      from_column: destination_state
+    - column: destination_hub_name
+      from_column: destination_hub_name
+    - column: to_center_name
+      from_column: to_center_name
+    - column: receiver_name
+      from_column: receiver_name
+    - column: Zone
+      from_column: origin_zone
+    - column: status
+      from_column: status
+    - column: deliverydate
+      from_column: operation_time
+    - column: current_premise_name
+      from_column: current_premise_name
+  - name: t2_master_hubops
+    schema: silver_layer

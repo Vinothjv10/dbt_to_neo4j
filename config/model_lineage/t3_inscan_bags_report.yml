@@ -1,0 +1,87 @@
+model:
+  name: t3_inscan_bags_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_inscan_bags_report.sql
+  columns:
+  - name: bag_number
+    expression: awb_number
+    description: Bag barcode number
+  - name: inscan_hub_id
+    source_table: t2_master_hubops
+    source_column: premise_id
+    expression: o.premise_id
+    description: Hub ID where bag was inscanned
+  - name: inscan_hub_name
+    source_table: t2_master_hubops
+    source_column: premise_name
+    expression: o.premise_name
+    description: Hub name where bag was inscanned
+  - name: origin_hub_id
+    source_table: t1_bgs_bag_hubops
+    source_column: premise_id
+    expression: bg.premise_id
+    description: Origin hub ID of the bag
+  - name: origin_hub_name
+    source_table: t1_prs_premise_master_hubops
+    source_column: premise_name
+    expression: pp.premise_name
+    description: Origin hub name of the bag
+  - name: destination_hub_id
+    expression: case when destination_hub_id is null then mix_destination_hub_id else
+      destination_hub_id end
+    description: Destination hub ID of the bag
+  - name: destination_hub_name
+    expression: case when ppp.premise_name is null then pppp.premise_name else ppp.premise_name
+      end
+    description: Destination hub name of the bag
+    source_table: t1_prs_premise_master_hubops
+    source_column: premise_name
+  - name: inscan_time
+    expression: operation_time
+    description: Time when bag was inscanned
+  - name: user_id
+    source_table: t2_master_hubops
+    source_column: user_id
+    expression: o.user_id
+    description: User ID of person who scanned the bag
+  - name: inscanned_by_username
+    expression: SPLIT_PART(o.email_id, '', 1)
+    description: Username of person who scanned the bag
+  - name: bag_weight
+    expression: bag_weight
+    description: Weight of the bag in kilograms
+  - name: content_type
+    expression: content_type
+    description: Type of content in the bag
+  - name: mode
+    expression: mode
+    description: Mode identifier
+  - name: travel_by
+    expression: travel_by
+    description: Travel mode for the bag
+  - name: shipment_count
+    expression: shipment_count
+    description: Number of shipments in the bag
+  upstreams:
+  - name: t2_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: inscan_hub_id
+      from_column: premise_id
+    - column: inscan_hub_name
+      from_column: premise_name
+    - column: user_id
+      from_column: user_id
+  - name: t1_bgs_bag_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: origin_hub_id
+      from_column: premise_id
+  - name: t1_prs_premise_master_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: origin_hub_name
+      from_column: premise_name
+    - column: destination_hub_name
+      from_column: premise_name

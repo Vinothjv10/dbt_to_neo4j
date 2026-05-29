@@ -1,0 +1,104 @@
+model:
+  name: t3_booking_vs_delivery_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/HubOps_Dashboard/t3_booking_vs_delivery_report.sql
+  columns:
+  - name: documentno
+    expression: "SELECT\n    B.documentno"
+    description: AWB number (document identifier)
+  - name: booking_datetime
+    source_table: t2_master_hubops_bk
+    source_column: booking_datetime
+    expression: B.booking_datetime
+    description: datetime when the shipment was booked
+  - name: delivery_date
+    expression: CASE WHEN L.status = '' THEN L.status_captured_at END
+    description: datetime when the shipment was delivered
+  - name: charges
+    source_table: t2_master_hubops_bk
+    source_column: charges
+    expression: B.charges
+    description: Total charges for the shipment
+  - name: document_type
+    source_table: t2_master_hubops_bk
+    source_column: document_type
+    expression: B.document_type
+    description: Type of document
+  - name: booking_type
+    source_table: t2_master_hubops_bk
+    source_column: booking_type
+    expression: B.booking_type
+    description: Type of booking
+  - name: booking_cp_id
+    source_table: t2_master_hubops_bk
+    source_column: booking_cp_id
+    expression: B.booking_cp_id
+    description: Booking CP ID of the shipment
+  - name: booking_cp
+    source_table: t2_master_hubops_bk
+    source_column: booking_cp_name
+    expression: B.booking_cp_name
+    description: Booking CP name of the shipment
+  - name: from_hub_id
+    source_table: t2_master_hubops_bk
+    source_column: from_hub_id
+    expression: B.from_hub_id
+    description: Origin hub ID of the shipment
+  - name: from_hub
+    expression: from_hub_name
+    description: Origin hub name of the shipment
+  - name: from_center
+    expression: origin_city
+    description: Origin city/center of the shipment
+  - name: state
+    expression: origin_state
+    description: Origin state of the shipment
+  - name: to_center
+    expression: destination_city
+    description: Destination city/center of the shipment
+  - name: sender
+    source_table: t1_ss_address_details_hubops
+    source_column: sender_name
+    expression: H.sender_name
+    description: Sender name
+  - name: receiver
+    source_table: t1_ss_address_details_hubops
+    source_column: receiver_name
+    expression: H.receiver_name
+    description: Receiver name
+  - name: status
+    source_table: t1_drs_orderdeliveryevents_final_fulfill_6M
+    source_column: status
+    expression: COALESCE(L.status, '')
+    description: Current delivery status
+  upstreams:
+  - name: t2_master_hubops_bk
+    schema: silver_layer
+    column_lineage:
+    - column: booking_datetime
+      from_column: booking_datetime
+    - column: charges
+      from_column: charges
+    - column: document_type
+      from_column: document_type
+    - column: booking_type
+      from_column: booking_type
+    - column: booking_cp_id
+      from_column: booking_cp_id
+    - column: booking_cp
+      from_column: booking_cp_name
+    - column: from_hub_id
+      from_column: from_hub_id
+  - name: t1_drs_orderdeliveryevents_final_fulfill_6M
+    schema: silver_layer
+    column_lineage:
+    - column: status
+      from_column: status
+  - name: t1_ss_address_details_hubops
+    schema: silver_layer
+    column_lineage:
+    - column: sender
+      from_column: sender_name
+    - column: receiver
+      from_column: receiver_name

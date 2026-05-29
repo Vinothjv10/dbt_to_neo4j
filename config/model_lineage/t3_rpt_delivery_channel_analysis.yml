@@ -1,0 +1,149 @@
+model:
+  name: t3_rpt_delivery_channel_analysis
+  schema: silver_layer
+  materialized: table
+  file_path: models/Dispatch_Dashboard/t3_rpt_delivery_channel_analysis.sql
+  columns:
+  - name: oda_deliveries
+    expression: '* from'
+  - name: business
+    data_type: null
+    description: Business indicator field (empty string placeholder)
+    source: manifest_only
+  - name: shipment_type
+    data_type: null
+    description: Type of shipment (COURIER or from DRS payload)
+    source: manifest_only
+  - name: awb_number
+    data_type: null
+    description: Air Waybill number - unique shipment tracking identifier
+    source: manifest_only
+  - name: hub
+    data_type: null
+    description: Hub name where the shipment is handled
+    source: manifest_only
+  - name: hub_state
+    data_type: null
+    description: State where the hub is located
+    source: manifest_only
+  - name: delivery_agent_channel_partner
+    data_type: null
+    description: Channel partner name for delivery agent
+    source: manifest_only
+  - name: cp_state
+    data_type: null
+    description: State of the channel partner
+    source: manifest_only
+  - name: delivery_agent_delivery_partner
+    data_type: null
+    description: Delivery partner name
+    source: manifest_only
+  - name: dp_state
+    data_type: null
+    description: State of the delivery partner
+    source: manifest_only
+  - name: drs_created_at
+    data_type: null
+    description: Timestamp when the DRS was created
+    source: manifest_only
+  - name: drs_created_date
+    data_type: null
+    description: Date when the DRS was created
+    source: manifest_only
+  - name: delivery_agent_id
+    data_type: null
+    description: Unique delivery agent identifier
+    source: manifest_only
+  - name: delivery_agent
+    data_type: null
+    description: Name of the delivery agent
+    source: manifest_only
+  - name: new_drs_number
+    data_type: null
+    description: Current DRS number
+    source: manifest_only
+  - name: old_drs_number
+    data_type: null
+    description: Legacy DRS number
+    source: manifest_only
+  - name: drs_creation_source
+    data_type: null
+    description: Source system for DRS creation
+    source: manifest_only
+  - name: status_captured_at
+    data_type: null
+    description: Timestamp when the status was captured
+    source: manifest_only
+  - name: status_capture_date
+    data_type: null
+    description: Date when the status was captured
+    source: manifest_only
+  - name: status_source
+    data_type: null
+    description: Source of the status update
+    source: manifest_only
+  - name: status
+    data_type: null
+    description: Current status of the shipment
+    source: manifest_only
+  - name: latitude
+    data_type: null
+    description: Latitude coordinate of the location
+    source: manifest_only
+  - name: longitude
+    data_type: null
+    description: Longitude coordinate of the location
+    source: manifest_only
+  - name: status_category
+    data_type: null
+    description: Normalized status category (out_for_delivery, undelivered, rto_initiated, delivered, etc.)
+    source: manifest_only
+  upstreams:
+  - name: t2_master_delivery_events
+    schema: silver_layer
+    column_lineage:
+    - column: awb_number
+      from_column: awb_number
+    - column: hub
+      from_column: hub
+    - column: hub_state
+      from_column: hub_state
+    - column: delivery_agent_channel_partner
+      from_column: delivery_agent_channel_partner
+    - column: cp_state
+      from_column: cp_state
+    - column: delivery_agent_delivery_partner
+      from_column: delivery_agent_delivery_partner
+    - column: dp_state
+      from_column: dp_state
+    - column: drs_created_at
+      from_column: drs_created_at
+    - column: drs_created_date
+      from_column: drs_created_at
+    - column: delivery_agent_id
+      from_column: delivery_agent_id
+    - column: delivery_agent
+      from_column: delivery_agent
+    - column: new_drs_number
+      from_column: new_drs_number
+    - column: old_drs_number
+      from_column: old_drs_number
+    - column: drs_creation_source
+      from_column: drs_source
+    - column: status_captured_at
+      from_column: status_captured_at
+    - column: status_capture_date
+      from_column: status_captured_at
+    - column: status_source
+      from_column: status_source
+    - column: status
+      from_column: status
+    - column: latitude
+      from_column: latitude
+    - column: longitude
+      from_column: longitude
+  - name: t1_drs_payload_final_fulfill_6M
+    schema: silver_layer
+    column_lineage:
+    - column: shipment_type
+      from_column: shipmenttype
