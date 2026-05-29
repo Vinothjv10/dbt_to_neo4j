@@ -1,0 +1,186 @@
+model:
+  name: t3_delivery_mis_report
+  schema: silver_layer
+  materialized: table
+  file_path: models/Dispatch_Dashboard/t3_delivery_mis_report.sql
+  columns:
+  - name: date
+    expression: "the last outscan of the day per shipment to any cp by the hub\n    3. if a shipment is outscanned on two\
+      \ different days - then the outscan count would be +1 on those two different days\n    4. all columns must have same\
+      \ day outscan values\n\nhub     cp      awb     outscan date\n1       2       123     jan 1 9am\n1       2       123\
+      \     jan 1 11pm\n1       2       123     jan 3 9am\n\ncp      awb     inscan date\n2       123     jan 1 2pm\n2   \
+      \    123     jan 1 5pm\n2       123     jan 3 10am\n\nhub    cp      date        shipments_out        shipments_in\n\
+      1      2       jan 1       1                    1\n1      2       jan 3       1                    1\n*/\n\n\n\nselect\n\
+      \    A.outscan_date"
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: outscan_date
+  - name: A.premise_id
+    expression: A.premise_id
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: premise_id
+  - name: A.hub
+    expression: A.hub
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: hub
+  - name: A.type
+    expression: A.type
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: type
+  - name: A.cp_id
+    expression: A.cp_id
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: cp_id
+  - name: A.channel_partner
+    expression: A.channel_partner
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: channel_partner
+  - name: shipments_outscanned
+    expression: count(distinct A.awb_number)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_inscanned_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_inscan_count > 0 or A.other_cp_same_day_inscan_count > 0 then
+      A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_not_inscanned_on_same_day
+    expression: count(distinct case when coalesce(A.same_cp_same_day_inscan_count, 0) = 0 and coalesce(A.other_cp_same_day_inscan_count,
+      0) = 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_ofd_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_ofd_count > 0 or A.other_cp_same_day_ofd_count > 0 then A.awb_number
+      end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_rto_ofd_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_rto_ofd_count > 0 or A.other_cp_same_day_rto_ofd_count > 0 then
+      A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_delivered_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_delivered_count > 0 or A.other_cp_same_day_delivered_count > 0
+      then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_rto_delivered_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_rto_delivered_count > 0 or A.other_cp_same_day_rto_delivered_count
+      > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_rto_initiated_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_rto_initiated_count > 0 or A.other_cp_same_day_rto_initiated_count
+      > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_undelivered_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_undelivered_count > 0 or A.other_cp_same_day_undelivered_count
+      > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: shipments_rto_undelivered_on_same_day
+    expression: count(distinct case when A.same_cp_same_day_rto_undelivered_count > 0 or A.other_cp_same_day_rto_undelivered_count
+      > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd
+    expression: count(distinct case when A.same_cp_next_day_delivered_count > 0 or A.same_cp_next_day_rto_delivered_count
+      > 0 or A.other_cp_next_day_delivered_count > 0 or A.other_cp_next_day_rto_delivered_count > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd_plus_1
+    expression: count(distinct case when A.same_cp_d_plus_2_delivered_count > 0 or A.same_cp_d_plus_2_rto_delivered_count
+      > 0 or A.other_cp_d_plus_2_delivered_count > 0 or A.other_cp_d_plus_2_rto_delivered_count > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd_plus_2
+    expression: count(distinct case when A.same_cp_d_plus_3_delivered_count > 0 or A.same_cp_d_plus_3_rto_delivered_count
+      > 0 or A.other_cp_d_plus_3_delivered_count > 0 or A.other_cp_d_plus_3_rto_delivered_count > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd_plus_3
+    expression: count(distinct case when A.same_cp_d_plus_4_delivered_count > 0 or A.same_cp_d_plus_4_rto_delivered_count
+      > 0 or A.other_cp_d_plus_4_delivered_count > 0 or A.other_cp_d_plus_4_rto_delivered_count > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd_plus_4
+    expression: count(distinct case when A.same_cp_d_plus_5_delivered_count > 0 or A.same_cp_d_plus_5_rto_delivered_count
+      > 0 or A.other_cp_d_plus_5_delivered_count > 0 or A.other_cp_d_plus_5_rto_delivered_count > 0 then A.awb_number end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  - name: ndd_greater_4
+    expression: count(distinct case when A.same_cp_d_greater_5_delivered_count > 0 or A.same_cp_d_greater_5_rto_delivered_count
+      > 0 or A.other_cp_d_greater_5_delivered_count > 0 or A.other_cp_d_greater_5_rto_delivered_count > 0 then A.awb_number
+      end)
+    description: ''
+    source_table: t2_hub_outscan_wise_awb_level_details
+    source_column: awb_number
+  upstreams:
+  - name: t2_hub_outscan_wise_awb_level_details
+    schema: silver_layer
+    column_lineage:
+    - column: date
+      from_column: outscan_date
+    - column: A.premise_id
+      from_column: premise_id
+    - column: A.hub
+      from_column: hub
+    - column: A.type
+      from_column: type
+    - column: A.cp_id
+      from_column: cp_id
+    - column: A.channel_partner
+      from_column: channel_partner
+    - column: shipments_outscanned
+      from_column: awb_number
+    - column: shipments_inscanned_on_same_day
+      from_column: awb_number
+    - column: shipments_not_inscanned_on_same_day
+      from_column: awb_number
+    - column: shipments_ofd_on_same_day
+      from_column: awb_number
+    - column: shipments_rto_ofd_on_same_day
+      from_column: awb_number
+    - column: shipments_delivered_on_same_day
+      from_column: awb_number
+    - column: shipments_rto_delivered_on_same_day
+      from_column: awb_number
+    - column: shipments_rto_initiated_on_same_day
+      from_column: awb_number
+    - column: shipments_undelivered_on_same_day
+      from_column: awb_number
+    - column: shipments_rto_undelivered_on_same_day
+      from_column: awb_number
+    - column: ndd
+      from_column: awb_number
+    - column: ndd_plus_1
+      from_column: awb_number
+    - column: ndd_plus_2
+      from_column: awb_number
+    - column: ndd_plus_3
+      from_column: awb_number
+    - column: ndd_plus_4
+      from_column: awb_number
+    - column: ndd_greater_4
+      from_column: awb_number
