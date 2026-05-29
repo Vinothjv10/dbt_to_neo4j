@@ -28,3 +28,5 @@ tables:
 - silver_layer.t3_rpt_delivery_channel_analysis
 - silver_layer.t3_shipment_current_location
 - silver_layer.t3_shipments_inscan_vs_outscan_report
+- silver_layer.t3_delivery_mis_report
+- silver_layer.t2_hub_outscan_wise_awb_level_details

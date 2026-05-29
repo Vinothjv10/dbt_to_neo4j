@@ -305,6 +305,65 @@ LEFT JOIN silver_layer.t3_pincode_distance_matrix t3_pincode_distance_
 
 
 -- ═══════════════════════════════════════════════
+-- Model: silver_layer.t3_delivery_mis_report
+-- File: models/Dispatch_Dashboard/t3_delivery_mis_report.sql
+-- Columns: 22 | Upstreams: 1
+-- ═══════════════════════════════════════════════
+
+SELECT
+  t.date,  -- t2_hub_outscan_wise_awb_level_details.outscan_date
+  t.A.premise_id,  -- t2_hub_outscan_wise_awb_level_details.premise_id
+  t.A.hub,  -- t2_hub_outscan_wise_awb_level_details.hub
+  t.A.type,  -- t2_hub_outscan_wise_awb_level_details.type
+  t.A.cp_id,  -- t2_hub_outscan_wise_awb_level_details.cp_id
+  t.A.channel_partner,  -- t2_hub_outscan_wise_awb_level_details.channel_partner
+  t.shipments_outscanned,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_inscanned_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_not_inscanned_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_ofd_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_rto_ofd_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_delivered_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_rto_delivered_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_rto_initiated_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_undelivered_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.shipments_rto_undelivered_on_same_day,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd_plus_1,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd_plus_2,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd_plus_3,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd_plus_4,  -- t2_hub_outscan_wise_awb_level_details.awb_number
+  t.ndd_greater_4  -- t2_hub_outscan_wise_awb_level_details.awb_number
+FROM silver_layer.t3_delivery_mis_report t
+LEFT JOIN silver_layer.t2_hub_outscan_wise_awb_level_details t2_hub_outscan_wise_
+  ON
+    t.date = t2_hub_outscan_wise_.outscan_date AND
+    t.A.premise_id = t2_hub_outscan_wise_.premise_id AND
+    t.A.hub = t2_hub_outscan_wise_.hub AND
+    t.A.type = t2_hub_outscan_wise_.type AND
+    t.A.cp_id = t2_hub_outscan_wise_.cp_id AND
+    t.A.channel_partner = t2_hub_outscan_wise_.channel_partner AND
+    t.shipments_outscanned = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_inscanned_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_not_inscanned_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_ofd_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_rto_ofd_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_delivered_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_rto_delivered_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_rto_initiated_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_undelivered_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.shipments_rto_undelivered_on_same_day = t2_hub_outscan_wise_.awb_number AND
+    t.ndd = t2_hub_outscan_wise_.awb_number AND
+    t.ndd_plus_1 = t2_hub_outscan_wise_.awb_number AND
+    t.ndd_plus_2 = t2_hub_outscan_wise_.awb_number AND
+    t.ndd_plus_3 = t2_hub_outscan_wise_.awb_number AND
+    t.ndd_plus_4 = t2_hub_outscan_wise_.awb_number AND
+    t.ndd_greater_4 = t2_hub_outscan_wise_.awb_number
+
+-- WHERE 1=1
+--   AND t.<column> = '<value>'
+
+
+-- ═══════════════════════════════════════════════
 -- Model: silver_layer.t3_incoming_shipments
 -- File: models/HubOps_Dashboard/t3_incoming_shipments.sql
 -- Columns: 12 | Upstreams: 3
