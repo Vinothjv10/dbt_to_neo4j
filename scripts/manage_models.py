@@ -21,22 +21,20 @@ Usage:
 import argparse, json, os, re, sys, yaml
 from pathlib import Path
 
-# ── Paths ─────────────────────────────────────────────────────────────
-DBT_ROOT = Path("/home/ubuntu/smile_dbt_model/smile_dbt_model")
+# ── Default Paths ──────────────────────────────────────────────────────
+DEFAULT_DBT_ROOT = "/home/ubuntu/smile_dbt_model/smile_dbt_model"
 YAML_DIR = Path("/home/ubuntu/neo4j/config/model_lineage")
 TABLES_YAML = Path("/home/ubuntu/neo4j/config/tables.yaml")
 
-MANIFEST_PATH = DBT_ROOT / "target" / "manifest.json"
-
 # ── Helpers ───────────────────────────────────────────────────────────
 
-def load_manifest():
-    with open(MANIFEST_PATH) as f:
+def load_manifest(dbt_root):
+    with open(Path(dbt_root) / "target" / "manifest.json") as f:
         return json.load(f)
 
-def find_sql_file(model_name):
+def find_sql_file(model_name, dbt_root):
     """Find the .sql file for a model in the dbt project."""
-    for root, dirs, files in os.walk(DBT_ROOT / "models"):
+    for root, dirs, files in os.walk(Path(dbt_root) / "models"):
         for f in files:
             if f == f"{model_name}.sql":
                 return Path(root) / f
@@ -275,8 +273,9 @@ def generate_column_lineage(columns, upstreams):
     return lineage_map
 
 
-def generate_model_yaml(model_name, columns, upstreams):
+def generate_model_yaml(model_name, columns, upstreams, dbt_root=None):
     """Generate a complete YAML data structure for a model."""
+    dbt_root = dbt_root or DEFAULT_DBT_ROOT
     # Build upstreams with column_lineage
     lineage_by_upstream = generate_column_lineage(columns, upstreams)
 
@@ -310,7 +309,7 @@ def generate_model_yaml(model_name, columns, upstreams):
             "name": model_name,
             "schema": "silver_layer",
             "materialized": "table",
-            "file_path": f"models/{find_model_folder(model_name)}/{model_name}.sql",
+            "file_path": f"models/{find_model_folder(model_name, dbt_root)}/{model_name}.sql",
             "columns": col_entries,
             "upstreams": upstream_entries,
         }
@@ -318,12 +317,12 @@ def generate_model_yaml(model_name, columns, upstreams):
     return data
 
 
-def find_model_folder(model_name):
+def find_model_folder(model_name, dbt_root):
     """Find the subfolder (relative to models/) where the model's SQL lives."""
-    for root, dirs, files in os.walk(DBT_ROOT / "models"):
+    for root, dirs, files in os.walk(Path(dbt_root) / "models"):
         for f in files:
             if f == f"{model_name}.sql":
-                rel = Path(root).relative_to(DBT_ROOT / "models")
+                rel = Path(root).relative_to(Path(dbt_root) / "models")
                 return str(rel)
     return "unknown"
 
@@ -416,13 +415,14 @@ def cmd_add(args):
     """Add a new model: scan SQL → generate YAML → update tables.yaml."""
     model_name = args.model
     dry_run = args.dry_run
+    dbt_root = args.dbt_path
 
     print(f"\n{'='*60}")
     print(f"ADD MODEL: {model_name}")
     print(f"{'='*60}")
 
     # 1. Find SQL file
-    sql_path = find_sql_file(model_name)
+    sql_path = find_sql_file(model_name, dbt_root)
     if not sql_path:
         print(f"  ✗ SQL file not found for model '{model_name}'")
         sys.exit(1)
@@ -452,7 +452,7 @@ def cmd_add(args):
         mapped = sum(1 for c in columns if c.get("source_table"))
         print(f"  ✓ Columns ({len(columns)} total, {mapped} with source mapping)")
 
-    data = generate_model_yaml(model_name, columns, upstreams)
+    data = generate_model_yaml(model_name, columns, upstreams, dbt_root)
 
     if dry_run:
         print(f"\n  ── Preview ──────────────────────────────────")
@@ -595,6 +595,8 @@ def main():
     p_add.add_argument("--model", "-m", required=True, help="Model name (from dbt project)")
     p_add.add_argument("--dry-run", "-n", action="store_true", help="Preview only, don't write")
     p_add.add_argument("--force", "-f", action="store_true", help="Overwrite existing YAML")
+    p_add.add_argument("--dbt-path", "-d", default=DEFAULT_DBT_ROOT,
+                       help=f"Path to dbt project root (default: {DEFAULT_DBT_ROOT})")
 
     # remove
     p_rm = sub.add_parser("remove", help="Remove a model from the lineage")
@@ -602,7 +604,7 @@ def main():
     p_rm.add_argument("--dry-run", "-n", action="store_true", help="Preview only, don't delete")
 
     # list
-    sub.add_parser("list", help="List all models in the lineage")
+    p_list = sub.add_parser("list", help="List all models in the lineage")
 
     args = parser.parse_args()
 

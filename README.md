@@ -239,7 +239,16 @@ It does NOT handle:
 - Multiple upstreams without explicit alias prefixes
 
 If your model uses these patterns, add `column_lineage` manually in the YAML,
-then run `make push-all`. See `make howto` for a complete reference.
+then run `make push-all`. See `make howto-add` for a complete reference.
+
+### Custom dbt project path
+
+If your dbt project is not at the default path, pass `DBT_PATH`:
+
+```bash
+make manage-add M=t3_YOUR_MODEL_NAME DBT_PATH=/path/to/dbt_project
+make manage-add M=t3_YOUR_MODEL_NAME DRY_RUN=1 DBT_PATH=/path/to/dbt_project
+```
 
 ---
 
@@ -319,8 +328,8 @@ ORDER BY upstream_table;
 | `make patch-lineage` | Recompute column_lineage from SQL for known models |
 | `make validate` | Validate all models (refs, columns, tables.yaml) |
 | **Model Management** | |
-| `make manage-add M=name` | Add a new model (use `DRY_RUN=1` for preview) |
-| `make manage-force-add M=name` | Force-add a model (overwrite existing YAML) |
+| `make manage-add M=name` | Add a new model (use `DRY_RUN=1` for preview, `DBT_PATH=/path` for custom dbt) |
+| `make manage-force-add M=name` | Force-add a model (overwrite existing YAML; also supports `DBT_PATH`) |
 | `make manage-remove M=name` | Remove a model (use `DRY_RUN=1` for preview) |
 | `make manage-list` | List all models with upstream/column counts |
 | **Verification** | |
@@ -335,7 +344,10 @@ ORDER BY upstream_table;
 | `make tables T=a,b` | PG→Neo4j with inline table list |
 | `make clean-db` | Clear Neo4j database |
 | **Docs** | |
-| `make howto` | Display the HOWTO add/remove models document |
+| `make howto` | List available HOWTO documents |
+| `make howto-add` | Show the HOWTO for adding a model |
+| `make howto-remove` | Show the HOWTO for removing a model |
+| `make howto-full` | Show the full combined HOWTO (add + remove) |
 
 ---
 
@@ -375,7 +387,9 @@ ORDER BY upstream_table;
 ├── setup.sh                           # One-time setup script
 ├── pyproject.toml                     # Python package config
 ├── README.md                          # This file
-└── HOWTO_add_remove_models.md         # Standalone guide for add/remove
+├── HOWTO_add_model.md                 # Standalone guide: adding a model
+├── HOWTO_remove_model.md              # Standalone guide: removing a model
+└── HOWTO_add_remove_models.md         # Combined guide (add + remove)
 ```
 
 ---
@@ -469,6 +483,6 @@ ORDER BY model, upstream;
 | `make verify` shows wrong counts | Run `make push-all` to rebuild graph; confirm `clear_before_write: true` in `config/settings.yaml` |
 | YAML has wrong upstreams | Edit YAML file, run `make push-all` again |
 | Need to start fresh | Run `make push-lineage` (clears graph and rewrites from YAML) |
-| `manage-add` says model not found | Model name doesn't match SQL filename or dbt model name — check `/models/**/NAME.sql` |
+| `manage-add` says model not found | Wrong model name or wrong dbt project path — check `ls /models/**/NAME.sql` or pass `DBT_PATH=/path` |
 | Orphan upstream still in Neo4j after remove | `tables.yaml` still references it — remove manually or ignore (does no harm) |
 | `manage-add` produces empty `column_lineage` | Model uses CTEs or `SELECT *` — fill `column_lineage` manually (see `make howto`) |

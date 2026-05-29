@@ -60,17 +60,17 @@ validate: ## Validate all models: SQL refs vs YAML, columns vs lineage, tables.y
 
 # ── Model Management ────────────────────────────────────────────────────
 
-manage-add: ## Add a model: make manage-add M=model_name [DRY_RUN=1]
-	python scripts/manage_models.py add --model $(M) $(if $(DRY_RUN),--dry-run,)
+manage-add: ## Add a model: make manage-add M=name [DRY_RUN=1] [DBT_PATH=/path/to/dbt]
+	.venv/bin/python scripts/manage_models.py add --model $(M) $(if $(DRY_RUN),--dry-run,) $(if $(DBT_PATH),--dbt-path $(DBT_PATH),)
 
-manage-force-add: ## Force-add a model (overwrite if YAML exists): make manage-force-add M=name
-	python scripts/manage_models.py add --model $(M) --force
+manage-force-add: ## Force-add (overwrite YAML): make manage-force-add M=name [DBT_PATH=/path]
+	.venv/bin/python scripts/manage_models.py add --model $(M) --force $(if $(DBT_PATH),--dbt-path $(DBT_PATH),)
 
-manage-remove: ## Remove a model: make manage-remove M=model_name [DRY_RUN=1]
-	python scripts/manage_models.py remove --model $(M) $(if $(DRY_RUN),--dry-run,)
+manage-remove: ## Remove a model: make manage-remove M=name [DRY_RUN=1]
+	.venv/bin/python scripts/manage_models.py remove --model $(M) $(if $(DRY_RUN),--dry-run,)
 
 manage-list: ## List all models with upstream/column counts
-	python scripts/manage_models.py list
+	.venv/bin/python scripts/manage_models.py list
 
 # ── Verification ────────────────────────────────────────────────────────
 
@@ -105,5 +105,17 @@ push-all-validate: push-lineage generate-joins validate verify ## Extended cycle
 
 # ── Docs ────────────────────────────────────────────────────────────────
 
-howto: ## Display the HOWTO document (add/remove models)
+howto: ## List available HOWTO documents
+	@echo "Available guides:"
+	@echo "  make howto-add     — Add a new model"
+	@echo "  make howto-remove  — Remove a model"
+	@echo "  make howto-full    — Full combined reference (add + remove)"
+
+howto-add: ## Show the HOWTO for adding a model
+	@cat HOWTO_add_model.md | less
+
+howto-remove: ## Show the HOWTO for removing a model
+	@cat HOWTO_remove_model.md | less
+
+howto-full: ## Show the full combined HOWTO (add + remove)
 	@cat HOWTO_add_remove_models.md | less
