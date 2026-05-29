@@ -9,7 +9,6 @@ tables:
 - silver_layer.t1_ss_shipment_dimentions_hubops_6M
 - silver_layer.t1_ss_shipment_operation_code_master
 - silver_layer.t1_st_shipment_tat_details_hubops
-- silver_layer.t2_hub_outscan_wise_awb_level_details
 - silver_layer.t2_master_delivery_events
 - silver_layer.t2_master_hubops
 - silver_layer.t2_master_hubops_bk
@@ -19,7 +18,6 @@ tables:
 - silver_layer.t3_booking_data_vs_status_report
 - silver_layer.t3_booking_vs_delivery_report
 - silver_layer.t3_booking_vs_first_inscan_report
-- silver_layer.t3_delivery_mis_report
 - silver_layer.t3_incoming_shipments
 - silver_layer.t3_inscan_bags_report
 - silver_layer.t3_inscan_shipments_report
