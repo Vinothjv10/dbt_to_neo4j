@@ -7,3 +7,8 @@ build/
 .venv/
 venv/
 .python-version
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/

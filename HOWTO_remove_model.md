@@ -112,10 +112,10 @@ Should return zero rows.
 
 ```bash
 # Preview
-python scripts/manage_models.py remove --model t3_YOUR_MODEL_NAME --dry-run
+.venv/bin/python scripts/manage_models.py remove --model t3_YOUR_MODEL_NAME --dry-run
 
 # Commit
-python scripts/manage_models.py remove --model t3_YOUR_MODEL_NAME
+.venv/bin/python scripts/manage_models.py remove --model t3_YOUR_MODEL_NAME
 ```
 
 Note: `--dbt-path` is not needed for remove — the dbt project path is only used

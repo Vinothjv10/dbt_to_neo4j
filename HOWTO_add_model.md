@@ -11,14 +11,14 @@ parse SELECT columns, generate the YAML lineage file, and push to Neo4j.
 # Preview only (dry run)
 make manage-add M=model_name DRY_RUN=1
 
-# Preview with custom dbt project path
-make manage-add M=model_name DRY_RUN=1 DBT_PATH=/path/to/dbt_project
-
 # Commit the model
 make manage-add M=model_name
 
 # Push to Neo4j + verify
 make push-all
+
+# With custom dbt project path
+make manage-add M=model_name DRY_RUN=1 DBT_PATH=/path/to/dbt_project
 ```
 
 ---
@@ -136,10 +136,10 @@ If your dbt project lives elsewhere, pass `--dbt-path` (or `-d` for short):
 make manage-add M=t3_YOUR_MODEL_NAME DBT_PATH=/path/to/dbt_project
 
 # Direct python invocation
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dbt-path /path/to/dbt_project
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dbt-path /path/to/dbt_project
 
 # With dry-run
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run -d /path/to/dbt_project
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run -d /path/to/dbt_project
 ```
 
 ---
@@ -148,16 +148,16 @@ python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run -d /pat
 
 ```bash
 # Preview
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run
 
 # Preview with custom dbt path
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run -d /path/to/dbt
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --dry-run -d /path/to/dbt
 
 # Commit
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME
 
 # Force overwrite
-python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --force
+.venv/bin/python scripts/manage_models.py add --model t3_YOUR_MODEL_NAME --force
 ```
 
 ---

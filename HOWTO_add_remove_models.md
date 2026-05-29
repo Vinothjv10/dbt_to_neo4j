@@ -30,13 +30,13 @@ After every `add`, review the generated YAML before pushing.
 
 ```bash
 cd /home/ubuntu/neo4j
-python scripts/manage_models.py add --model YOUR_MODEL_NAME --dry-run
+make manage-add M=YOUR_MODEL_NAME DRY_RUN=1
 ```
 
 Example:
 
 ```bash
-python scripts/manage_models.py add --model t3_day_wise_operation_count --dry-run
+make manage-add M=t3_day_wise_operation_count DRY_RUN=1
 ```
 
 The script prints:
@@ -51,7 +51,7 @@ The script prints:
 ### Step 2: Commit the model
 
 ```bash
-python scripts/manage_models.py add --model YOUR_MODEL_NAME
+make manage-add M=YOUR_MODEL_NAME
 ```
 
 This writes two files:
@@ -117,52 +117,40 @@ RETURN c.name, c.description, upc.name AS maps_to, upc.source_table;
 
 ```bash
 cd /home/ubuntu/neo4j
-python scripts/manage_models.py remove --model YOUR_MODEL_NAME --dry-run
+make manage-remove M=YOUR_MODEL_NAME DRY_RUN=1
 ```
 
 Example:
 
 ```bash
-python scripts/manage_models.py remove --model t3_day_wise_operation_count --dry-run
+make manage-remove M=t3_day_wise_operation_count DRY_RUN=1
 ```
 
 The script reports:
 
 - Which upstreams (if any) would become **orphans** – tables no longer referenced by any remaining model
-- **Orphan handling**: If an upstream is only used by this model, it stays in `tables.yaml` (not auto-deleted). The script tells you which ones are orphaned but does NOT remove them automatically. You must decide whether to keep or delete them.
+- **Orphan handling**: The script **automatically removes** orphaned upstreams from `tables.yaml`. If an orphaned table is still useful outside this pipeline, you can re-add it later.
 
 Example output:
 
 ```
-  ✓ 3 orphaned upstreams detected: t1_ss_shipment_dimentions_hubops_6M,
-    t2_abnormal_shipments, t2_master_hubops_stats
-    → These tables are NOT referenced by any other model.
-    → They remain in tables.yaml. Delete manually if needed.
+  ✓ No orphaned upstreams — all upstream tables are
+    still used by other models.
 ```
 
 ### Step 2: Remove the model
 
 ```bash
-python scripts/manage_models.py remove --model YOUR_MODEL_NAME
+make manage-remove M=YOUR_MODEL_NAME
 ```
 
 This deletes:
 
-- `config/model_lineage/YOUR_MODEL_NAME.yml`
+- `config/model_lineage/YOUR_MODEL_NAME.yml` – the lineage YAML
+- Removes `YOUR_MODEL_NAME` from `config/tables.yaml`
+- Removes any orphaned upstream tables from `config/tables.yaml`
 
-It does NOT modify `tables.yaml` (even for orphans – you handle that manually).
-
-### Step 3: (Optional) Clean up orphan upstreams from tables.yaml
-
-If the dry run showed orphans and you want to remove them:
-
-```bash
-nano config/tables.yaml
-```
-
-Delete the lines for any orphaned tables. Save and exit.
-
-### Step 4: Push to Neo4j
+### Step 3: Push to Neo4j
 
 ```bash
 make push-all
@@ -170,7 +158,7 @@ make push-all
 
 This clears the graph and reloads only the remaining models. Orphan tables (and their columns) are removed from Neo4j automatically since the graph is rebuilt from scratch.
 
-### Step 5: Verify
+### Step 4: Verify
 
 ```bash
 source .env
@@ -217,7 +205,7 @@ make push-all
 Four models previously required post-generation patching. If you add a model that uses CTEs or complex JOINs, you can run the patch script which re-extracts column lineage from SQL for those models:
 
 ```bash
-python scripts/patch_lineage_4_models.py
+.venv/bin/python scripts/patch_lineage_4_models.py
 ```
 
 This only patches the four hard-coded models (`t3_Eway_Report`, `t3_master_booking_hubops_delivery`, `t3_rpt_delivery_channel_analysis`, `t3_shipments_inscan_vs_outscan_report`). To add your model to the patch list, edit the script and add its name to the `MODELS` list.
@@ -253,5 +241,5 @@ model:
 | `make push-lineage` says "Found 0 models" | `.env` not sourced or YAML dir wrong | Run `source .env && make push-lineage` |
 | Columns have empty `source_table`/`source_column` | Auto-extractor couldn't determine source (CTE, `SELECT *`, complex expr) | Fill `column_lineage` manually in YAML, then `make push-all` |
 | `make push-all` shows wrong counts | `clear_before_write: true` in settings.yaml is required for clean rebuilds | Check `config/settings.yaml` has `clear_before_write: true` |
-| `python scripts/manage_models.py add --model X` says model not found | Model name doesn't match the SQL filename or the dbt model name | Check `ls /home/ubuntu/smile_dbt_model/smile_dbt_model/models/**/X.sql` |
+| `make manage-add M=X` says model not found | Wrong model name or wrong dbt project path | Check model name or pass `DBT_PATH=/path/to/dbt` |
 | Orphan upstream still in Neo4j after remove | `tables.yaml` still references it | Either remove it from `tables.yaml` or ignore it (it does no harm) |

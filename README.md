@@ -239,7 +239,7 @@ It does NOT handle:
 - Multiple upstreams without explicit alias prefixes
 
 If your model uses these patterns, add `column_lineage` manually in the YAML,
-then run `make push-all`. See `make howto-add` for a complete reference.
+then run `make push-all`. See `make howto-add` for a detailed guide.
 
 ### Custom dbt project path
 
@@ -277,15 +277,15 @@ source .env
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USER" -p "$NEO4J_PASSWORD"
 ```
 
-**Expected counts (14 models):**
+**Expected counts (13 models after removing `t3_delivery_mis_report`):**
 
 | Item | Count |
 |------|-------|
 | Schemas | 1 |
-| Tables | 31 |
-| Columns | 519 |
-| DEPENDS_ON | 38 |
-| MAPS_TO | 244 |
+| Tables | 29 |
+| Columns | 476 |
+| DEPENDS_ON | 37 |
+| MAPS_TO | 222 |
 
 **Check a specific model:**
 
@@ -359,8 +359,7 @@ ORDER BY upstream_table;
 │   ├── settings.yaml                  # Pipeline settings (clear_before_write, etc.)
 │   ├── model_lineage/                 # Lineage YAML files (one per model)
 │   │   ├── t3_Eway_Report.yml
-│   │   ├── t3_delivery_mis_report.yml
-│   │   ├── ...
+│   │   ├── t3_*.yml                      # one per model
 │   │   └── _generated_joins.sql       # Auto-generated SQL JOINs
 │   └── lineage_inspection_queries.cypher  # Reference Cypher queries
 │
