@@ -16,7 +16,7 @@ JOIN columns are discovered.
 │  │ 1. Extract SQL refs  ──►  detect upstream tables             │  │
 │  │ 2. Parse SELECT      ──►  resolve aliases, extract columns   │  │
 │  │ 3. Map to upstream   ──►  determine source_table/source_col  │  │
-│  │ 4. Build column_lineage  ►  group by upstream table           │  │
+│  │ 4. Build column_lineage  ─►  group by upstream table         │  │
 │  │ 5. Generate YAML     ──►  write model_lineage/t3_X.yml       │  │
 │  │ 6. Update tables.yaml   ►  register model + new upstreams    │  │
 │  └──────────────────────────────────────────────────────────────┘  │
