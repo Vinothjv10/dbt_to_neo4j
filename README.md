@@ -348,6 +348,7 @@ ORDER BY upstream_table;
 | `make howto-add` | Show the HOWTO for adding a model |
 | `make howto-remove` | Show the HOWTO for removing a model |
 | `make howto-full` | Show the full combined HOWTO (add + remove) |
+| `make workflow` | Show the internal workflow (what happens when adding a model) |
 
 ---
 
@@ -388,7 +389,8 @@ ORDER BY upstream_table;
 ├── README.md                          # This file
 ├── HOWTO_add_model.md                 # Standalone guide: adding a model
 ├── HOWTO_remove_model.md              # Standalone guide: removing a model
-└── HOWTO_add_remove_models.md         # Combined guide (add + remove)
+├── HOWTO_add_remove_models.md         # Combined guide (add + remove)
+└── WORKFLOW.md                        # Internal workflow: what happens when adding a model
 ```
 
 ---

@@ -2,7 +2,7 @@
 .PHONY: run dry-run tables clean-db
 .PHONY: push-lineage push-dry-run push-summary generate-joins patch-lineage validate
 .PHONY: manage-add manage-remove manage-list manage-force-add
-.PHONY: verify verify-counts push-all push-all-validate howto
+.PHONY: verify verify-counts push-all push-all-validate howto workflow
 
 SHELL := bash
 
@@ -119,3 +119,6 @@ howto-remove: ## Show the HOWTO for removing a model
 
 howto-full: ## Show the full combined HOWTO (add + remove)
 	@cat HOWTO_add_remove_models.md | less
+
+workflow: ## Show the internal workflow document (what happens when adding a model)
+	@cat WORKFLOW.md | less
