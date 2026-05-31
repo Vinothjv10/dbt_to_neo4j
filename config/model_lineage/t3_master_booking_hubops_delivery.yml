@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/Control_Tower_Dashboard/t3_master_booking_hubops_delivery.sql
+  description: Master booking-to-delivery consolidated view. Comprehensive shipment lifecycle view from booking through middle-mile and last-mile, including status timestamps, anomaly detection flags, and integrated data from Sevasetu and HubOps systems.
   columns:
   - name: select
     expression: "select\n\t*"

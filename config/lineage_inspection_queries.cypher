@@ -2,6 +2,19 @@
 -- Neo4j Lineage Mapping Inspection Queries
 -- ═══════════════════════════════════════════════════════════════════
 
+-- 0. TABLE DESCRIPTIONS: View or search table descriptions
+
+-- 0a. All tables with descriptions
+-- MATCH (t:Table) RETURN t.schema, t.name, t.description ORDER BY t.schema, t.name;
+
+-- 0b. Tables missing descriptions
+-- MATCH (t:Table) WHERE t.description IS NULL OR t.description = ''
+-- RETURN t.schema, t.name ORDER BY t.schema, t.name;
+
+-- 0c. Search tables by description keyword
+-- MATCH (t:Table) WHERE toLower(t.description) CONTAINS toLower('audit')
+-- RETURN t.schema, t.name, t.description;
+
 -- 1. OVERVIEW: Node & relationship counts
 MATCH (s:Schema) RETURN 'Schemas' AS item, count(s) AS count
 UNION ALL MATCH (t:Table) RETURN 'Tables', count(t)

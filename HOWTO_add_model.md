@@ -76,11 +76,17 @@ make manage-force-add M=t3_YOUR_MODEL_NAME
 
 ### Step 3: Review the YAML
 
+Descriptions are **automatically extracted** from the dbt project's
+`schema.yml` files (via `manifest.json`) — both model-level and
+column-level descriptions are filled in automatically.
+
 ```bash
 nano config/model_lineage/t3_YOUR_MODEL_NAME.yml
 ```
 
 Verify:
+- `description:` at model level — auto-filled from dbt `schema.yml`
+- `columns[].description` — auto-filled from dbt column descriptions
 - `columns[].source_table` — does each column come from the right upstream?
 - `columns[].source_column` — does each column map to the right upstream column?
 - `upstreams[].column_lineage` — are the from/to pairs correct?
@@ -89,6 +95,8 @@ Verify:
 Fix any issues by editing the YAML directly, then run `make push-all`.
 
 ### Step 4: Push to Neo4j
+
+### Step 5: Push to Neo4j
 
 ```bash
 make push-all
@@ -99,7 +107,7 @@ This runs:
 2. `make generate-joins` — regenerates the SQL JOIN queries
 3. `make verify` — shows graph counts and all model→upstream joins
 
-### Step 5: Verify in Neo4j
+### Step 6: Verify in Neo4j
 
 ```bash
 source .env
@@ -207,10 +215,11 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/YourFolder/t3_YOUR_MODEL.sql
+  description: "Brief description of this model's purpose"     # ← Stored on (:Table) node in Neo4j
   columns:
     - name: column_name
       expression: SQL expression (original)
-      description: ''
+      description: ''                                            # ← Stored on (:Column) node in Neo4j
       source_table: upstream_table_name
       source_column: upstream_column_name
   upstreams:

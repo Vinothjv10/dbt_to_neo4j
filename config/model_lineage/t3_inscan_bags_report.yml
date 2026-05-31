@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_inscan_bags_report.sql
+  description: Bag inscan tracking report. Tracks receiving and scanning of physical bags at hubs, including bag origin/destination, weight, content type, shipment count, and scanning user details.
   columns:
   - name: bag_number
     expression: awb_number

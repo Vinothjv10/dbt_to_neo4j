@@ -23,9 +23,9 @@ An LLM or any application can query Neo4j to discover tables, columns, and JOIN 
 **What gets stored in Neo4j:**
 
 | Node/Edge | Meaning | Example |
-|---|---|---|
+|---|---|---|---|
 | `(:Schema)` | Database schema | `silver_layer` |
-| `(:Table)` | A table or dbt model | `t3_Eway_Report`, `t2_master_hubops` |
+| `(:Table)` | A table or dbt model with name, type, description | `t3_Eway_Report`, `t2_master_hubops` |
 | `(:Column)` | A column with name, data_type, description | `awb_number`, `booking_date` |
 | `(:Schema)-[:HAS_TABLE]->(:Table)` | Schema contains table | |
 | `(:Table)-[:HAS_COLUMN]->(:Column)` | Table contains column | |
@@ -121,7 +121,8 @@ make push-lineage
 This reads all YAML files from `config/model_lineage/` and creates the full graph in Neo4j:
 - Schema, Table, Column nodes
 - DEPENDS_ON (table-level) and MAPS_TO (column-level) relationships
-- Column descriptions from the YAML files
+- **Table descriptions** from `model.description` in each YAML file
+- **Column descriptions** from `columns[].description` in each YAML file
 
 ### See what would be pushed (without writing):
 
@@ -170,6 +171,7 @@ The script:
 - Finds the `.sql` file in the dbt project
 - Extracts `{{ ref() }}` upstream table names
 - Parses SELECT columns with source mappings
+- **Extracts model + column descriptions from dbt `manifest.json`** (auto-filled from `schema.yml`)
 - Prints the full YAML it will generate
 
 **Review the output carefully.** If `column_lineage` entries are missing (CTEs, `SELECT *`, complex expressions), you will need to fill them manually after generation. See `make howto` for details.
@@ -181,7 +183,7 @@ make manage-add M=t3_day_wise_operation_count
 ```
 
 This:
-- Writes `config/model_lineage/t3_YOUR_MODEL.yml`
+- Writes `config/model_lineage/t3_YOUR_MODEL.yml` (with descriptions auto-filled)
 - Adds the model and any new upstream tables to `config/tables.yaml`
 
 #### Review the generated YAML:
@@ -190,7 +192,7 @@ This:
 nano config/model_lineage/t3_day_wise_operation_count.yml
 ```
 
-Check that `source_table`, `source_column`, and `column_lineage` are correct.
+Check that `description`, `source_table`, `source_column`, and `column_lineage` are correct.
 
 #### Push and verify:
 
@@ -300,6 +302,23 @@ RETURN c.name AS column, c.description,
 ORDER BY c.name;
 ```
 
+**List all tables with their descriptions:**
+
+```cypher
+MATCH (t:Table)
+RETURN t.schema, t.name, t.description
+ORDER BY t.schema, t.name;
+```
+
+**Find tables missing descriptions:**
+
+```cypher
+MATCH (t:Table)
+WHERE t.description IS NULL OR t.description = ''
+RETURN t.schema, t.name
+ORDER BY t.schema, t.name;
+```
+
 **Find JOIN conditions for a model:**
 
 ```cypher
@@ -321,7 +340,7 @@ ORDER BY upstream_table;
 | `make venv` | Recreate virtual environment from scratch |
 | `make reinstall` | Reinstall package in existing venv |
 | **Lineage Pipeline** | |
-| `make push-lineage` | Push YAML lineage files to Neo4j |
+| `make push-lineage` | Push YAML lineage files (with table + column descriptions) to Neo4j |
 | `make push-dry-run` | Dry-run lineage push (preview only) |
 | `make push-summary` | Show lineage summary without connecting to Neo4j |
 | `make generate-joins` | Regenerate SQL JOIN queries from lineage YAML |
@@ -424,7 +443,22 @@ run `make verify` to see the live graph state.
 **"What tables are available?"**
 
 ```cypher
-MATCH (t:Table) RETURN t.name, t.schema ORDER BY t.name;
+MATCH (t:Table) RETURN t.name, t.schema, t.description ORDER BY t.name;
+```
+
+**"What is this table for?"**
+
+```cypher
+MATCH (t:Table {name: 't3_Eway_Report'})
+RETURN t.name, t.description;
+```
+
+**"Search tables by keyword in description"**
+
+```cypher
+MATCH (t:Table)
+WHERE toLower(t.description) CONTAINS toLower('audit')
+RETURN t.name, t.description;
 ```
 
 **"What columns does t3_Eway_Report have?"**
@@ -480,6 +514,7 @@ ORDER BY model, upstream;
 | `cypher-shell: command not found` | Install neo4j client or use `pip install neo4j` |
 | Wrong Neo4j password | Edit `.env` → `NEO4J_PASSWORD=correct_password` |
 | `push-lineage` says "Found 0 models" | `.env` not sourced or YAML dir wrong — run `source .env && make push-lineage` |
+| Table descriptions not showing in Neo4j | Add `description:` at model level in YAML and run `make push-lineage` (or `make push-all`) |
 | Columns have empty `source_table`/`source_column` | Auto-extractor couldn't determine source (CTE, `SELECT *`, complex expr) |
 | `make verify` shows wrong counts | Run `make push-all` to rebuild graph; confirm `clear_before_write: true` in `config/settings.yaml` |
 | YAML has wrong upstreams | Edit YAML file, run `make push-all` again |

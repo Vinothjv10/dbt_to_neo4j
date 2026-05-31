@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_outscan_shipments.sql
+  description: Outgoing (outscan) shipments report. Tracks all shipments being dispatched from hubs with origin/destination details, transport mode, and operational status for outbound flow monitoring.
   columns:
   - name: booking_complete_time
     expression: "select\n\t  SD.booking_complete_time"

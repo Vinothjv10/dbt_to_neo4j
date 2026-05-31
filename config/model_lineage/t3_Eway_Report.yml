@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_Eway_Report.sql
+  description: E-way Bill compliance tracking report. Tracks e-way bill generation, expiry, and part-B updates for shipments requiring GST e-way bill compliance across the logistics network.
   columns:
   - name: awb_number
     expression: SELECT

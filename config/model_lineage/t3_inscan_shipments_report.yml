@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_inscan_shipments_report.sql
+  description: Shipment inscan (inbound receipt) report. Tracks all shipments physically received at hubs with inscan timestamps, booking details, and outscan follow-up times for processing cycle time measurement.
   columns:
   - name: operation_time
     expression: "SELECT\n\t\ts2.operation_time"

@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_booking_data_vs_status_report.sql
+  description: Booking data vs shipment status audit report. Cross-references original booking details (hub, CP, pincode, product type) with audit weight and current status to identify discrepancies and support operational audits.
   columns:
   - name: shipment_no
     expression: "SELECT\n    D.awb_number"

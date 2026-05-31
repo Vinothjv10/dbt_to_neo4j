@@ -12,7 +12,8 @@ CYPHER_MERGE_SCHEMA = """
 CYPHER_MERGE_TABLE = """
     MATCH (s:Schema {name: $schema_name})
     MERGE (t:Table {name: $table_name, schema: $schema_name})
-    SET t.type = $table_type
+    SET t.type = $table_type,
+        t.description = $description
     MERGE (s)-[:HAS_TABLE]->(t)
     RETURN t
 """
@@ -71,8 +72,8 @@ class Neo4jWriter:
         if not self.dry_run:
             self.conn.run(CYPHER_MERGE_SCHEMA, {"name": name})
 
-    def write_table(self, schema: str, table: str, table_type: str):
-        params = {"schema_name": schema, "table_name": table, "table_type": table_type.lower()}
+    def write_table(self, schema: str, table: str, table_type: str, description: str = ""):
+        params = {"schema_name": schema, "table_name": table, "table_type": table_type.lower(), "description": description}
         self._log(CYPHER_MERGE_TABLE, params)
         if not self.dry_run:
             self.conn.run(CYPHER_MERGE_TABLE, params)
@@ -128,7 +129,7 @@ class Neo4jWriter:
 
     def write_table_data(self, data: TableData) -> None:
         t = data.table
-        self.write_table(t.table_schema, t.table_name, t.table_type)
+        self.write_table(t.table_schema, t.table_name, t.table_type, t.description)
 
         for col in data.columns:
             self.write_column(t.table_schema, t.table_name, col)

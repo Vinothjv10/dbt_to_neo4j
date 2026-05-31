@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_Fastrack_orders_report.sql
+  description: Fast Track / premium service orders report. Tracks high-priority (Fast Track and Value Plus) shipments with booking details, origin/destination info, and current status for priority service level monitoring.
   columns:
   - name: documentno
     expression: documentno

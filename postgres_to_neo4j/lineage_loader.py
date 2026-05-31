@@ -38,7 +38,8 @@ CYPHER_MERGE_SCHEMA = """
 
 CYPHER_MERGE_TABLE = """
     MERGE (t:Table {name: $table_name, schema: $schema_name})
-    SET t.type = $table_type
+    SET t.type = $table_type,
+        t.description = $description
     WITH t
     MATCH (s:Schema {name: $schema_name})
     MERGE (s)-[:HAS_TABLE]->(t)
@@ -123,6 +124,7 @@ class LineageLoader:
         schema = model.get("schema", "silver_layer")
         file_path = model.get("file_path", "")
         materialized = model.get("materialized", "table")
+        description = model.get("description", "")
 
         if not name:
             return
@@ -137,6 +139,7 @@ class LineageLoader:
             "schema_name": schema,
             "table_name": name,
             "table_type": materialized,
+            "description": description,
         })
 
         # 3. Column nodes
@@ -183,6 +186,7 @@ class LineageLoader:
                 "schema_name": up_schema,
                 "table_name": up_name,
                 "table_type": "table",
+                "description": "",
             })
 
             # DEPENDS_ON relationship

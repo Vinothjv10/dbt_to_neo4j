@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/Dispatch_Dashboard/t3_delivery_mis_report.sql
+  description: Delivery MIS (Management Information System) report. Hub and CP-level daily delivery performance metrics including outscan-to-inscan conversion, same-day delivery rates, and NDD (Next Day Delivery) SLA tracking.
   columns:
   - name: date
     expression: "the last outscan of the day per shipment to any cp by the hub\n    3. if a shipment is outscanned on two\

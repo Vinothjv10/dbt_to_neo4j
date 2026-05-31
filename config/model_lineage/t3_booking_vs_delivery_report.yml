@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_booking_vs_delivery_report.sql
+  description: Booking vs delivery performance report. Compares booking data (charges, document type, CP, hub) against actual delivery events to measure end-to-end fulfillment time and support charge reconciliation.
   columns:
   - name: documentno
     expression: "SELECT\n    B.documentno"

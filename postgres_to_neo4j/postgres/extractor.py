@@ -38,6 +38,7 @@ class PostgresExtractor:
                         table_schema=row["table_schema"],
                         table_name=row["table_name"],
                         table_type=row["table_type"],
+                        description=row.get("description") or "",
                     ))
         return results
 

@@ -1,28 +1,40 @@
 RESOLVE_TABLES_ALL = """
-    SELECT table_schema, table_name, table_type
-    FROM information_schema.tables
-    WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
-    ORDER BY table_schema, table_name
+    SELECT t.table_schema, t.table_name, t.table_type,
+           pg_catalog.obj_description(c.oid, 'pg_class') AS description
+    FROM information_schema.tables t
+    LEFT JOIN pg_catalog.pg_class c ON c.relname = t.table_name
+    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace AND n.nspname = t.table_schema
+    WHERE t.table_schema NOT IN ('pg_catalog', 'information_schema')
+    ORDER BY t.table_schema, t.table_name
 """
 
 RESOLVE_TABLES_BY_SCHEMA = """
-    SELECT table_schema, table_name, table_type
-    FROM information_schema.tables
-    WHERE table_schema = %s
-    ORDER BY table_name
+    SELECT t.table_schema, t.table_name, t.table_type,
+           pg_catalog.obj_description(c.oid, 'pg_class') AS description
+    FROM information_schema.tables t
+    LEFT JOIN pg_catalog.pg_class c ON c.relname = t.table_name
+    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace AND n.nspname = t.table_schema
+    WHERE t.table_schema = %s
+    ORDER BY t.table_name
 """
 
 RESOLVE_TABLES_FULLY_QUALIFIED = """
-    SELECT table_schema, table_name, table_type
-    FROM information_schema.tables
-    WHERE table_schema = %s AND table_name = %s
+    SELECT t.table_schema, t.table_name, t.table_type,
+           pg_catalog.obj_description(c.oid, 'pg_class') AS description
+    FROM information_schema.tables t
+    LEFT JOIN pg_catalog.pg_class c ON c.relname = t.table_name
+    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace AND n.nspname = t.table_schema
+    WHERE t.table_schema = %s AND t.table_name = %s
 """
 
 RESOLVE_TABLES_UNQUALIFIED = """
-    SELECT table_schema, table_name, table_type
-    FROM information_schema.tables
-    WHERE table_name = %s
-    ORDER BY table_schema
+    SELECT t.table_schema, t.table_name, t.table_type,
+           pg_catalog.obj_description(c.oid, 'pg_class') AS description
+    FROM information_schema.tables t
+    LEFT JOIN pg_catalog.pg_class c ON c.relname = t.table_name
+    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace AND n.nspname = t.table_schema
+    WHERE t.table_name = %s
+    ORDER BY t.table_schema
 """
 
 COLUMNS_WITH_PK = """

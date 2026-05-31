@@ -6,6 +6,7 @@ class TableInfo:
     table_schema: str
     table_name: str
     table_type: str
+    description: str = ""
 
 
 @dataclass

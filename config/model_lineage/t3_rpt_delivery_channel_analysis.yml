@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/Dispatch_Dashboard/t3_rpt_delivery_channel_analysis.sql
+  description: Delivery channel partner performance analysis report. Analyzes delivery agent and channel partner performance with DRS (Delivery Run Sheet) data, status tracking, and geo-location for last-mile delivery optimization.
   columns:
   - name: oda_deliveries
     expression: '* from'

@@ -28,10 +28,6 @@ TABLES_YAML = Path("/home/ubuntu/neo4j/config/tables.yaml")
 
 # ── Helpers ───────────────────────────────────────────────────────────
 
-def load_manifest(dbt_root):
-    with open(Path(dbt_root) / "target" / "manifest.json") as f:
-        return json.load(f)
-
 def find_sql_file(model_name, dbt_root):
     """Find the .sql file for a model in the dbt project."""
     for root, dirs, files in os.walk(Path(dbt_root) / "models"):
@@ -273,9 +269,45 @@ def generate_column_lineage(columns, upstreams):
     return lineage_map
 
 
-def generate_model_yaml(model_name, columns, upstreams, dbt_root=None):
+def load_manifest(dbt_root):
+    with open(Path(dbt_root) / "target" / "manifest.json") as f:
+        return json.load(f)
+
+
+def extract_model_description(manifest, model_name):
+    """Extract model-level description from dbt manifest.json."""
+    prefix = f"model.{manifest.get('metadata', {}).get('project_name', 'smile_dbt_model')}."
+    node = manifest.get("nodes", {}).get(f"{prefix}{model_name}", {})
+    if not node:
+        # Try alternate: model.{project_name}.{model_name} with the name from the YAML dir
+        for key, n in manifest.get("nodes", {}).items():
+            if n.get("name") == model_name and n.get("resource_type") == "model":
+                node = n
+                break
+    return (node.get("description") or "") if node else ""
+
+
+def extract_column_descriptions(manifest, model_name):
+    """Extract column-level descriptions from dbt manifest.json.
+    Returns dict: column_name → description
+    """
+    prefix = f"model.{manifest.get('metadata', {}).get('project_name', 'smile_dbt_model')}."
+    node = manifest.get("nodes", {}).get(f"{prefix}{model_name}", {})
+    if not node:
+        for key, n in manifest.get("nodes", {}).items():
+            if n.get("name") == model_name and n.get("resource_type") == "model":
+                node = n
+                break
+    if not node:
+        return {}
+    cols = node.get("columns", {})
+    return {name: info.get("description", "") for name, info in cols.items()}
+
+
+def generate_model_yaml(model_name, columns, upstreams, dbt_root=None, model_description="", col_descriptions=None):
     """Generate a complete YAML data structure for a model."""
     dbt_root = dbt_root or DEFAULT_DBT_ROOT
+    col_descriptions = col_descriptions or {}
     # Build upstreams with column_lineage
     lineage_by_upstream = generate_column_lineage(columns, upstreams)
 
@@ -295,10 +327,11 @@ def generate_model_yaml(model_name, columns, upstreams, dbt_root=None):
                 })
         upstream_entries.append(entry)
 
-    # Build columns list
+    # Build columns list with descriptions from manifest
     col_entries = []
     for c in columns:
-        entry = {"name": c["name"], "expression": c["expression"], "description": c["description"] or ""}
+        desc = col_descriptions.get(c["name"]) or c.get("description") or ""
+        entry = {"name": c["name"], "expression": c["expression"], "description": desc}
         if c.get("source_table") and c.get("source_column"):
             entry["source_table"] = c["source_table"]
             entry["source_column"] = c["source_column"]
@@ -310,6 +343,7 @@ def generate_model_yaml(model_name, columns, upstreams, dbt_root=None):
             "schema": "silver_layer",
             "materialized": "table",
             "file_path": f"models/{find_model_folder(model_name, dbt_root)}/{model_name}.sql",
+            "description": model_description,
             "columns": col_entries,
             "upstreams": upstream_entries,
         }
@@ -452,7 +486,26 @@ def cmd_add(args):
         mapped = sum(1 for c in columns if c.get("source_table"))
         print(f"  ✓ Columns ({len(columns)} total, {mapped} with source mapping)")
 
-    data = generate_model_yaml(model_name, columns, upstreams, dbt_root)
+    # 5. Extract descriptions from dbt manifest.json
+    model_description = ""
+    col_descriptions = {}
+    manifest_path = Path(dbt_root) / "target" / "manifest.json"
+    if manifest_path.exists():
+        try:
+            manifest = load_manifest(dbt_root)
+            model_description = extract_model_description(manifest, model_name)
+            col_descriptions = extract_column_descriptions(manifest, model_name)
+            if model_description:
+                print(f"  ✓ Model description: {model_description[:80]}...")
+            if col_descriptions:
+                filled = sum(1 for c in columns if col_descriptions.get(c["name"]))
+                print(f"  ✓ Column descriptions: {filled}/{len(columns)} columns have descriptions from manifest")
+        except Exception as e:
+            print(f"  - Could not read manifest.json: {e}")
+
+    data = generate_model_yaml(model_name, columns, upstreams, dbt_root,
+                                model_description=model_description,
+                                col_descriptions=col_descriptions)
 
     if dry_run:
         print(f"\n  ── Preview ──────────────────────────────────")
@@ -466,14 +519,14 @@ def cmd_add(args):
         yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True, width=120)
     print(f"  ✓ YAML written: {yaml_path}")
 
-    # 6. Add to tables.yaml
+    # 7. Add to tables.yaml
     added_model = add_to_tables_yaml(model_name)
     if added_model:
         print(f"  ✓ Added '{model_name}' to config/tables.yaml")
     else:
         print(f"  - '{model_name}' already in config/tables.yaml")
 
-    # 7. Add upstreams to tables.yaml
+    # 8. Add upstreams to tables.yaml
     added_count = 0
     for up in upstreams:
         if add_to_tables_yaml(up):
@@ -483,9 +536,9 @@ def cmd_add(args):
 
     print(f"\n  ✅ Model '{model_name}' added successfully!")
     print(f"  Next steps:")
-    print(f"    1. Review the YAML:  nano {yaml_path}")
-    print(f"    2. Push to Neo4j:    make push-lineage")
-    print(f"    3. Generate SQL:     make generate-joins")
+    print(f"    1. Push to Neo4j:    make push-lineage")
+    print(f"    2. Generate SQL:     make generate-joins")
+    print(f"    3. Verify:           make verify")
 
 
 def cmd_remove(args):

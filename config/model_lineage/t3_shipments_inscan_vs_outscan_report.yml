@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_shipments_inscan_vs_outscan_report.sql
+  description: Inscan vs outscan hub efficiency report. Tracks hub-level inbound vs outbound processing volumes and weights with pending backlog identification for shift-level operational efficiency analysis.
   columns:
   - name: date
     expression: "SELECT\n    i.inscan_date"

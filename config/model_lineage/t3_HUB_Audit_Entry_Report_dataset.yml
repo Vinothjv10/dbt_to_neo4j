@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_HUB_Audit_Entry_Report_dataset.sql
+  description: Hub-level audit entry report. Captures weight audit data including booked vs audited weight comparison, volumetric measurements, and audit method (auto/manual) for hub operations quality assurance.
   columns:
   - name: document_no
     expression: "SELECT\n\tA.awb_no"

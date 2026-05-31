@@ -3,6 +3,7 @@ model:
   schema: silver_layer
   materialized: table
   file_path: models/HubOps_Dashboard/t3_booking_vs_first_inscan_report.sql
+  description: Booking vs first inscan timing report. Measures time from booking to first inscan at origin hub, with distance segmentation for service level agreement (SLA) compliance analysis.
   columns:
   - name: date
     expression: SELECT
